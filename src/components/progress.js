@@ -1,25 +1,29 @@
-// Progreso local por módulo + umbral para pedir inicio de sesión
+// Progreso local por módulo + umbral para pedir inicio de sesión (por perfil invitado/usuario)
 import { getProgress } from './gamification.js';
 import { getPlayerNickname, getSchoolProfile, getModuleCache } from './profile.js';
 import { showModal } from './ui.js';
+import {
+  getGuestId,
+  getActiveProfileId,
+  scopedKey,
+  migrateLegacyModuleProgressIfNeeded,
+  onUserLogin,
+  onUserLogout
+} from './progress-profile.js';
+
+export { getGuestId, onUserLogin, onUserLogout, getActiveProfileId };
 
 const PREFIX = 'logika_';
 const MODULES = ['logic', 'sets', 'graphs', 'relations'];
 const LOGIN_PROMPT_KEY = PREFIX + 'login_prompt_shown';
-const ACTION_COUNT_KEY = PREFIX + 'local_action_count';
-const MODULES_KEY = PREFIX + 'module_progress';
+const ACTION_COUNT_KEY = 'local_action_count';
 
-/** Tras N interacciones con recompensa, sugerir iniciar sesión */
 export const ACTIONS_BEFORE_LOGIN_HINT = 4;
 export const XP_BEFORE_LOGIN_HINT = 120;
 
-export function getGuestId() {
-  let id = localStorage.getItem(PREFIX + 'guest_id');
-  if (!id) {
-    id = `guest_${crypto.randomUUID?.() ?? Date.now()}`;
-    localStorage.setItem(PREFIX + 'guest_id', id);
-  }
-  return id;
+function modulesStorageKey() {
+  migrateLegacyModuleProgressIfNeeded();
+  return scopedKey('module_progress');
 }
 
 function defaultModuleState(moduleId) {
@@ -29,7 +33,8 @@ function defaultModuleState(moduleId) {
     updatedAt: null,
     lessonsCompleted: [],
     learnComplete: false,
-    currentPhase: 'learn'
+    currentPhase: 'learn',
+    complexity: null
   };
   if (moduleId === 'sets') {
     return { ...base, phase: 'learn', learnCount: 0, practiceWins: 0 };
@@ -48,7 +53,7 @@ function defaultModuleState(moduleId) {
 
 export function getAllModuleProgress() {
   try {
-    const raw = localStorage.getItem(MODULES_KEY);
+    const raw = localStorage.getItem(modulesStorageKey());
     const parsed = raw ? JSON.parse(raw) : {};
     const out = {};
     MODULES.forEach((m) => {
@@ -72,19 +77,20 @@ export function saveModuleProgress(moduleId, patch) {
     hasActivity: true,
     updatedAt: new Date().toISOString()
   };
-  localStorage.setItem(MODULES_KEY, JSON.stringify(all));
+  localStorage.setItem(modulesStorageKey(), JSON.stringify(all));
   bumpLocalActionCount();
   return all[moduleId];
 }
 
 function bumpLocalActionCount() {
-  const n = parseInt(localStorage.getItem(ACTION_COUNT_KEY) || '0', 10) + 1;
-  localStorage.setItem(ACTION_COUNT_KEY, n);
+  const key = scopedKey(ACTION_COUNT_KEY);
+  const n = parseInt(localStorage.getItem(key) || '0', 10) + 1;
+  localStorage.setItem(key, n);
   return n;
 }
 
 export function getLocalActionCount() {
-  return parseInt(localStorage.getItem(ACTION_COUNT_KEY) || '0', 10);
+  return parseInt(localStorage.getItem(scopedKey(ACTION_COUNT_KEY)) || '0', 10);
 }
 
 export function shouldSuggestLogin() {
@@ -120,6 +126,7 @@ export function buildProgressPayload(email = '') {
   const school = getSchoolProfile();
   return {
     guestId: getGuestId(),
+    profileId: getActiveProfileId(),
     email: email || localStorage.getItem(PREFIX + 'auth_email') || '',
     nickname: getPlayerNickname() || progress.username,
     xp: progress.xp,
@@ -136,7 +143,7 @@ export function buildProgressPayload(email = '') {
 export function resetModuleProgress(moduleId) {
   const all = getAllModuleProgress();
   all[moduleId] = defaultModuleState(moduleId);
-  localStorage.setItem(MODULES_KEY, JSON.stringify(all));
+  localStorage.setItem(modulesStorageKey(), JSON.stringify(all));
 }
 
 export function offerModuleResume(moduleId, labels, onContinue, onRestart) {

@@ -1,16 +1,15 @@
 import { getProgress } from './gamification.js';
-import { getAllModuleProgress, getModuleProgress } from './progress.js';
+import { getModuleProgress } from './progress.js';
 import { isModuleComplete, getModuleCompletionPercent } from './certificates.js';
 import { getLearnProgressPercent, isLearnPhaseComplete } from './module-learn.js';
 import { LEARNING_PATH } from '../config/learning-path.js';
-import { getLessonsForModule } from '../config/module-lessons.js';
+import { getLessonsForModule, isRouteModuleLocked } from '../config/learning-mode.js';
 import { icon, refreshIcons } from './icons.js';
 
 export function refreshLearningRouteView() {
   const container = document.getElementById('route-modules-list');
   if (!container) return;
 
-  const all = getAllModuleProgress();
   let html = '';
 
   LEARNING_PATH.forEach((mod, idx) => {
@@ -18,10 +17,7 @@ export function refreshLearningRouteView() {
     const practicePct = getModuleCompletionPercent(mod.id);
     const lessons = getLessonsForModule(mod.id);
     const doneLessons = (getModuleProgress(mod.id).lessonsCompleted || []).length;
-    const routeLocked =
-      idx > 0 &&
-      !isModuleComplete(LEARNING_PATH[idx - 1].id) &&
-      !all[LEARNING_PATH[idx - 1]?.id]?.completed;
+    const routeLocked = isRouteModuleLocked(mod.id);
 
     const overall = Math.round(learnPct * 0.4 + practicePct * 0.6);
 

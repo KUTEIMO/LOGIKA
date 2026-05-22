@@ -7,7 +7,7 @@ import {
   Laptop, Bot, Shield, Globe, MapPin, Lightbulb, Code, Palette, Settings,
   ArrowLeft, Trash2, Table, Award, Loader2, Circle, Eraser, Route, Waypoints,
   MousePointer2, CircleHelp, X, Volume2, VolumeX, CircleCheck, CircleX,
-  Crown, Link, Plus, TriangleAlert, CircleUser
+  Crown, Link, Plus, TriangleAlert, CircleUser, SlidersHorizontal
 } from 'lucide';
 
 const iconRegistry = {
@@ -17,7 +17,7 @@ const iconRegistry = {
   Laptop, Bot, Shield, Globe, MapPin, Lightbulb, Code, Palette, Settings,
   ArrowLeft, Trash2, Table, Award, Loader2, Circle, Eraser, Route, Waypoints,
   MousePointer2, CircleHelp, X, Volume2, VolumeX, CircleCheck, CircleX,
-  Crown, Link, Plus, TriangleAlert, CircleUser
+  Crown, Link, Plus, TriangleAlert, CircleUser, SlidersHorizontal
 };
 
 export function initIcons(root = document) {

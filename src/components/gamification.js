@@ -1,4 +1,5 @@
 // Gamification & Audio Synthesis Engine using Web Audio API (No dependencies, KISS)
+import { scopedKey, migrateLegacyModuleProgressIfNeeded } from './progress-profile.js';
 
 let audioCtx = null;
 let isSoundEnabled = true;
@@ -123,16 +124,29 @@ export function playLevelUp() {
   });
 }
 
-// User Progress & Storage Engine
+// User Progress & Storage Engine (scoped por perfil invitado / usuario)
 const STORAGE_PREFIX = 'logika_';
 
+function readScoped(name, fallback) {
+  migrateLegacyModuleProgressIfNeeded();
+  const key = scopedKey(name);
+  const v = localStorage.getItem(key);
+  if (v !== null) return v;
+  const legacy = localStorage.getItem(STORAGE_PREFIX + name);
+  if (legacy !== null) {
+    localStorage.setItem(key, legacy);
+    return legacy;
+  }
+  return fallback;
+}
+
 export function getProgress() {
-  const xp = parseInt(localStorage.getItem(STORAGE_PREFIX + 'xp') || '0', 10);
-  const streak = parseInt(localStorage.getItem(STORAGE_PREFIX + 'streak') || '0', 10);
-  const level = parseInt(localStorage.getItem(STORAGE_PREFIX + 'level') || '1', 10);
+  const xp = parseInt(readScoped('xp', '0'), 10);
+  const streak = parseInt(readScoped('streak', '0'), 10);
+  const level = parseInt(readScoped('level', '1'), 10);
   const username = localStorage.getItem(STORAGE_PREFIX + 'username') || 'Invitado';
   const isLoggedIn = localStorage.getItem(STORAGE_PREFIX + 'is_logged_in') === 'true';
-  const completedChallenges = JSON.parse(localStorage.getItem(STORAGE_PREFIX + 'completed_challenges') || '[]');
+  const completedChallenges = JSON.parse(readScoped('completed_challenges', '[]'));
   
   return { xp, streak, level, username, isLoggedIn, completedChallenges };
 }
@@ -146,18 +160,18 @@ export function addXP(amount, challengeId = null) {
       return { levelUp: false, newXP: current.xp };
     }
     current.completedChallenges.push(challengeId);
-    localStorage.setItem(STORAGE_PREFIX + 'completed_challenges', JSON.stringify(current.completedChallenges));
+    localStorage.setItem(scopedKey('completed_challenges'), JSON.stringify(current.completedChallenges));
   }
   
   const newXP = current.xp + amount;
-  localStorage.setItem(STORAGE_PREFIX + 'xp', newXP);
+  localStorage.setItem(scopedKey('xp'), String(newXP));
   
   // Calculate Level (KISS: 200 XP per level)
   const newLevel = Math.floor(newXP / 200) + 1;
   let levelUp = false;
   
   if (newLevel > current.level) {
-    localStorage.setItem(STORAGE_PREFIX + 'level', newLevel);
+    localStorage.setItem(scopedKey('level'), String(newLevel));
     levelUp = true;
     playLevelUp();
   } else {
@@ -171,7 +185,7 @@ export function addXP(amount, challengeId = null) {
 export function updateStreak() {
   const todayStr = new Date().toISOString().split('T')[0];
   const lastActive = localStorage.getItem(STORAGE_PREFIX + 'last_active');
-  let currentStreak = parseInt(localStorage.getItem(STORAGE_PREFIX + 'streak') || '0', 10);
+  let currentStreak = parseInt(readScoped('streak', '0'), 10);
   
   if (!lastActive) {
     // First time
@@ -192,7 +206,7 @@ export function updateStreak() {
     // If diffDays is 0, it is the same day. Do nothing.
   }
   
-  localStorage.setItem(STORAGE_PREFIX + 'streak', currentStreak);
+  localStorage.setItem(scopedKey('streak'), String(currentStreak));
   localStorage.setItem(STORAGE_PREFIX + 'last_active', todayStr);
   updateUI();
 }
