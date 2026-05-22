@@ -1,0 +1,18 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Leads de colegio: solo crear desde la app (sin leer público)
+    match /school_leads/{docId} {
+      allow create: if request.resource.data.keys().hasAll(['schoolName', 'studentName', 'grade']);
+      allow read, update, delete: if false;
+    }
+    match /achievements/{docId} {
+      allow create: if request.resource.data.keys().hasAll(['displayName', 'achievementTitle']);
+      allow read, update, delete: if false;
+    }
+    match /progress_snapshots/{docId} {
+      allow create: if true;
+      allow read, update, delete: if false;
+    }
+  }
+}
