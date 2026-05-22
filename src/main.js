@@ -40,40 +40,11 @@ import { refreshLearningRouteView, refreshRouteSummary } from './components/lear
 import { refreshProfileView } from './components/profile-ui.js';
 import { initAllModulePhases, initModulePhases } from './components/module-learn.js';
 import { SCHOOL_ROUTE_CERTIFICATE } from './config/learning-path.js';
+import { SCHOOL_ADVENTURE } from './config/school-adventure.js';
 
-// School Guest Mode Quiz State
+// School Guest Mode: lección → reto por etapa
 let schoolQuizStepIndex = 0;
-const schoolQuizData = [
-  {
-    title: "Reto 1 de 3 · Lógica de Programación",
-    question: "Un robot de almacén está programado con la siguiente regla lógica:<br><br><strong>El robot avanza SI Y SOLO SI no detecta obstáculo Y tiene batería cargada.</strong><br><br>Si el sensor indica que Obstáculo = FALSO (no hay) y Batería = VERDADERO (está cargada). ¿Cuál es la decisión correcta del robot?",
-    options: [
-      { text: "Avanzar (El condicional lógico es verdadero)", value: "correct" },
-      { text: "Quedarse quieto (El condicional lógico es falso)", value: "wrong" },
-      { text: "Entrar en cortocircuito", value: "wrong" }
-    ],
-    explanation: "<strong>¡Correcto!</strong> En lógica proposicional, si representamos Obstáculo como <i>o</i> y Batería como <i>b</i>, la condición es: <code>~o ^ b</code>. Como <code>~F ^ V</code> equivale a <code>V ^ V = V</code>, la salida es verdadera y el robot avanza. ¡Así es como el software toma decisiones mediante compuertas lógicas!"
-  },
-  {
-    title: "Reto 2 de 3 · Ciberseguridad y Conjuntos",
-    question: "Un especialista en ciberseguridad de la Unisimón quiere filtrar servidores vulnerables. Necesita encontrar los servidores que: <strong>Son computadores Linux (Conjunto A) Y tienen malware detectado (Conjunto B), pero EXCLUYENDO a los que tienen Cortafuegos activo (Conjunto C).</strong><br><br>¿Cuál operación representa este filtro?",
-    options: [
-      { text: "(A ∪ B) ∩ C (Unión de Linux y malware, intersecado con cortafuegos)", value: "wrong" },
-      { text: "(A ∩ B) - C (Intersección de Linux y malware, restando cortafuegos)", value: "correct" },
-      { text: "A - B - C (Linux menos malware menos cortafuegos)", value: "wrong" }
-    ],
-    explanation: "<strong>¡Correcto!</strong> La intersección <code>A ∩ B</code> selecciona elementos que cumplen AMBAS condiciones (Linux y Malware), y la diferencia <code>- C</code> remueve a los que tienen Cortafuegos activo. ¡Las bases de datos SQL y firewalls usan álgebra de conjuntos para filtrar datos y proteger redes!"
-  },
-  {
-    title: "Reto 3 de 3 · Rutas de Videojuegos y Grafos",
-    question: "Queremos transmitir datos en un juego multijugador online desde Cúcuta a un servidor en Bogotá. Hay dos caminos posibles en la red:<br><br>1. <strong>Línea directa (A → D):</strong> con un PING (latencia/peso) de <strong>8 ms</strong>.<br>2. <strong>Ruta alternativa (A → B → D):</strong> pasando por un nodo en Bucaramanga. El ping A-B es de <strong>2 ms</strong> y el ping B-D es de <strong>3 ms</strong>.<br><br>¿Qué ruta elegirá un algoritmo de enrutamiento de Sistemas?",
-    options: [
-      { text: "La ruta alternativa A → B → D (Ping total de 5 ms)", value: "correct" },
-      { text: "La línea directa A → D (Ping total de 8 ms)", value: "wrong" }
-    ],
-    explanation: "<strong>¡Correcto!</strong> En teoría de grafos, los algoritmos de camino mínimo (como Dijkstra) no miran el número de conexiones físicas, sino la suma de los pesos (latencia). La suma de la ruta indirecta es 2 + 3 = 5 ms, que es mejor que 8 ms. ¡Así es como Google Maps calcula el camino más rápido para evitar trancones!"
-  }
-];
+let schoolSubPhase = 'lesson';
 
 document.addEventListener('DOMContentLoaded', () => {
   initTheme();
@@ -137,7 +108,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (targetViewId === 'landing-view') {
       renderMascot('mascot-landing-placeholder', 'normal');
     } else if (targetViewId === 'school-view') {
-      renderMascot('mascot-school-container', 'thoughtful');
+      renderMascot('mascot-school-container', 'friendly');
     } else if (targetViewId === 'dashboard-view') {
       setGlobalMascotExpression('happy', { speak: false });
       refreshDashboardUI();
@@ -405,7 +376,7 @@ document.addEventListener('DOMContentLoaded', () => {
     refreshSchoolCtaUI();
     playSuccess();
     showToast('¡Listo! Ya puedes empezar la aventura.', 'success');
-    renderMascot('mascot-school-container', 'happy');
+    renderMascot('mascot-school-container', 'friendly');
     document.getElementById('school-mascot-bubble').textContent =
       '¡Perfecto! Cuando termines los retos, te preparo una medalla con tu nombre.';
 
@@ -421,10 +392,16 @@ document.addEventListener('DOMContentLoaded', () => {
     schoolCtaSaved?.classList.add('hidden');
   });
 
-  // 6. Colegio Invitado: Gamified Quiz Loop
+  // 6. Colegio invitado: lección → reto
   const btnStartSchoolQuiz = document.getElementById('btn-start-school-quiz');
   const quizArea = document.getElementById('school-quiz-area');
   const quizProgress = document.getElementById('school-quiz-progress');
+  const lessonPanel = document.getElementById('school-lesson-panel');
+  const challengePanel = document.getElementById('school-challenge-panel');
+  const lessonStep = document.getElementById('school-lesson-step');
+  const lessonTitle = document.getElementById('school-lesson-title');
+  const lessonBody = document.getElementById('school-lesson-body');
+  const btnSchoolToChallenge = document.getElementById('btn-school-to-challenge');
   const quizStep = document.getElementById('school-quiz-step');
   const quizTitle = document.getElementById('school-quiz-title');
   const quizBody = document.getElementById('school-quiz-body');
@@ -433,9 +410,18 @@ document.addEventListener('DOMContentLoaded', () => {
   const quizFeedback = document.getElementById('quiz-feedback');
   const quizExplanationPanel = document.getElementById('quiz-explanation-panel');
   const quizExplanationContent = document.getElementById('quiz-explanation-content');
-  
+  const schoolMascotBubble = document.getElementById('school-mascot-bubble');
+
   let selectedOptionIndex = null;
   let hasCheckedAnswer = false;
+
+  function setSchoolMascot(text, expression = 'friendly') {
+    if (schoolMascotBubble) {
+      schoolMascotBubble.innerHTML = text;
+      refreshIcons(schoolMascotBubble);
+    }
+    renderMascot('mascot-school-container', expression);
+  }
 
   btnStartSchoolQuiz?.addEventListener('click', () => {
     if (!hasSchoolProfile()) {
@@ -446,34 +432,61 @@ document.addEventListener('DOMContentLoaded', () => {
     playClick();
     const saved = getSchoolQuizProgress();
     schoolQuizStepIndex = saved?.completed ? 0 : (saved?.stepIndex ?? 0);
+    schoolSubPhase = 'lesson';
     quizArea.classList.remove('hidden');
     loadSchoolQuizStep();
-    
-    // Smooth scroll down to quiz
+
     setTimeout(() => {
       quizArea.scrollIntoView({ behavior: 'smooth' });
     }, 100);
   });
 
+  btnSchoolToChallenge?.addEventListener('click', () => {
+    playClick();
+    schoolSubPhase = 'challenge';
+    loadSchoolChallenge();
+  });
+
   function loadSchoolQuizStep() {
-    const stepData = schoolQuizData[schoolQuizStepIndex];
+    schoolSubPhase = 'lesson';
+    const stepData = SCHOOL_ADVENTURE[schoolQuizStepIndex];
+    const total = SCHOOL_ADVENTURE.length;
+    const pct = ((schoolQuizStepIndex + 1) / total) * 100;
+    quizProgress.style.width = `${pct}%`;
+
+    lessonPanel?.classList.remove('hidden');
+    challengePanel?.classList.add('hidden');
+
+    lessonStep.textContent = `Etapa ${schoolQuizStepIndex + 1} de ${total}`;
+    lessonTitle.textContent = stepData.lessonTitle;
+    lessonBody.innerHTML = stepData.lessonBody;
+
+    const profile = getSchoolProfile();
+    const name = profile?.studentName ? `${profile.studentName}, ` : '';
+    setSchoolMascot(`${name}${stepData.mascotLesson}`, 'friendly');
+
+    saveSchoolQuizProgress(schoolQuizStepIndex, false);
+    refreshIcons(lessonPanel);
+  }
+
+  function loadSchoolChallenge() {
+    const stepData = SCHOOL_ADVENTURE[schoolQuizStepIndex];
     selectedOptionIndex = null;
     hasCheckedAnswer = false;
 
-    // Reset button states
-    btnSchoolQuizNext.textContent = "Verificar Respuesta";
+    lessonPanel?.classList.add('hidden');
+    challengePanel?.classList.remove('hidden');
+
+    btnSchoolQuizNext.textContent = 'Verificar respuesta';
     btnQuizExplanation.classList.add('hidden');
     quizFeedback.classList.add('hidden');
     quizExplanationPanel.classList.add('hidden');
     quizExplanationContent.innerHTML = '';
 
-    // Update steps UI
-    const pct = ((schoolQuizStepIndex + 1) / schoolQuizData.length) * 100;
-    quizProgress.style.width = `${pct}%`;
-    quizStep.textContent = `Reto ${schoolQuizStepIndex + 1} de ${schoolQuizData.length}`;
-    quizTitle.textContent = stepData.title;
+    const total = SCHOOL_ADVENTURE.length;
+    quizStep.textContent = `Reto ${schoolQuizStepIndex + 1} de ${total}`;
+    quizTitle.textContent = stepData.challengeTitle;
 
-    // Load question content
     let optionsHTML = '';
     stepData.options.forEach((opt, idx) => {
       optionsHTML += `
@@ -489,26 +502,18 @@ document.addEventListener('DOMContentLoaded', () => {
       <div class="quiz-options-list">${optionsHTML}</div>
     `;
 
-    // Add option click events
     const optButtons = quizBody.querySelectorAll('.option-btn');
-    optButtons.forEach(btn => {
+    optButtons.forEach((btn) => {
       btn.addEventListener('click', () => {
         if (hasCheckedAnswer) return;
         playClick();
-        
-        optButtons.forEach(b => b.classList.remove('selected'));
+        optButtons.forEach((b) => b.classList.remove('selected'));
         btn.classList.add('selected');
-        
-        selectedOptionIndex = parseInt(btn.getAttribute('data-index'));
+        selectedOptionIndex = parseInt(btn.getAttribute('data-index'), 10);
       });
     });
 
-    renderMascot('mascot-school-container', 'thoughtful');
-    const profile = getSchoolProfile();
-    document.getElementById('school-mascot-bubble').textContent = profile
-      ? `${profile.studentName}, analiza bien las opciones. ¡Tú puedes lograrlo!`
-      : 'Analiza bien las opciones. ¡Tú puedes lograrlo!';
-    saveSchoolQuizProgress(schoolQuizStepIndex, false);
+    setSchoolMascot(stepData.mascotChallenge, 'thoughtful');
     refreshIcons(quizBody);
   }
 
@@ -518,13 +523,11 @@ document.addEventListener('DOMContentLoaded', () => {
       return;
     }
 
-    const stepData = schoolQuizData[schoolQuizStepIndex];
+    const stepData = SCHOOL_ADVENTURE[schoolQuizStepIndex];
 
     if (!hasCheckedAnswer) {
-      // CHECK ANSWER MODE
       hasCheckedAnswer = true;
       const optButtons = quizBody.querySelectorAll('.option-btn');
-      const selectedBtn = optButtons[selectedOptionIndex];
       const isCorrect = stepData.options[selectedOptionIndex].value === 'correct';
 
       optButtons.forEach((btn, idx) => {
@@ -543,31 +546,26 @@ document.addEventListener('DOMContentLoaded', () => {
 
       if (isCorrect) {
         playSuccess();
-        quizFeedback.innerHTML = `${icon('circle-check')} ¡Respuesta correcta!`;
+        quizFeedback.innerHTML = `${icon('circle-check')} ¡Bien hecho!`;
         refreshIcons(quizFeedback);
-        quizFeedback.className = "quiz-feedback-text text-green";
+        quizFeedback.className = 'quiz-feedback-text text-green';
         quizFeedback.classList.remove('hidden');
-        
-        renderMascot('mascot-school-container', 'happy');
-        document.getElementById('school-mascot-bubble').innerHTML = "¡Excelente! Veo madera de Ingeniero de Sistemas en ti.";
+        setSchoolMascot(`${icon('star')} ¡Genial! Siguiente lección o terminas la aventura.`, 'happy');
       } else {
         playError();
-        quizFeedback.textContent = "Respuesta incorrecta. Intentemos repasar.";
-        quizFeedback.className = "quiz-feedback-text text-danger";
+        quizFeedback.textContent = 'Casi — mira la explicación y prueba otra vez.';
+        quizFeedback.className = 'quiz-feedback-text text-danger';
         quizFeedback.classList.remove('hidden');
-        
-        renderMascot('mascot-school-container', 'sad');
-        document.getElementById('school-mascot-bubble').innerHTML = "¡Ups! Está bien equivocarse, así se aprende. Mira la explicación.";
+        setSchoolMascot(`${icon('lightbulb')} No pasa nada, equivocarse es parte del juego. Lee la explicación abajo.`, 'sad');
       }
 
       quizExplanationContent.innerHTML = stepData.explanation;
       quizExplanationPanel.classList.remove('hidden');
       btnQuizExplanation.classList.remove('hidden');
-      btnSchoolQuizNext.textContent = schoolQuizStepIndex < schoolQuizData.length - 1 ? "Siguiente Reto" : "Completar Aventura";
-      
+      btnSchoolQuizNext.textContent =
+        schoolQuizStepIndex < SCHOOL_ADVENTURE.length - 1 ? 'Siguiente etapa' : 'Completar aventura';
     } else {
-      // NEXT STEP MODE
-      if (schoolQuizStepIndex < schoolQuizData.length - 1) {
+      if (schoolQuizStepIndex < SCHOOL_ADVENTURE.length - 1) {
         schoolQuizStepIndex++;
         saveSchoolQuizProgress(schoolQuizStepIndex, false);
         loadSchoolQuizStep();
@@ -576,10 +574,7 @@ document.addEventListener('DOMContentLoaded', () => {
         saveSchoolQuizProgress(schoolQuizStepIndex, true);
         addXP(100, `school_adventure_complete_${Date.now()}`);
         playSuccess();
-        
-        renderMascot('mascot-school-container', 'happy');
-        document.getElementById('school-mascot-bubble').textContent =
-          '¡Felicidades! Mereces tu medalla. Descárgala y compártela.';
+        setSchoolMascot(`${icon('award')} ¡Lo lograste! Tu medalla te espera: descárgala y compártela.`, 'happy');
 
         tryAwardSpecialCertificate(
           'school_route',

@@ -4,92 +4,141 @@ export const MODULE_LESSONS = {
     {
       id: 'l1',
       title: '¿Qué es una proposición?',
-      body: `<p>Una <strong>proposición</strong> es una oración que puede ser <em>verdadera (V)</em> o <em>falsa (F)</em>, pero no ambas a la vez.</p>
-      <p>En LOGIKA usamos variables <code>p</code>, <code>q</code>, <code>r</code> para representar proposiciones.</p>
-      <ul><li>Ejemplo válido: «Hoy llueve» (puede ser V o F).</li><li>No es proposición: «¿Qué hora es?» (es pregunta).</li></ul>`
+      body: `
+        <p>Una <strong>proposición</strong> es una frase que puede clasificarse como <strong>verdadera (V)</strong> o <strong>falsa (F)</strong>, sin ambigüedad.</p>
+        <ul>
+          <li><strong>Sí es proposición:</strong> «Está lloviendo» (hoy puede ser V o F).</li>
+          <li><strong>No lo es:</strong> «¿Qué hora es?» (es pregunta, no V/F).</li>
+        </ul>
+        <p>En LOGIKA usamos letras <code>p</code>, <code>q</code>, <code>r</code> como variables.</p>
+        <p class="learn-tip">Piensa en interruptores: cada proposición es un switch que está encendido (V) o apagado (F).</p>
+      `
     },
     {
       id: 'l2',
       title: 'Conectores lógicos',
-      body: `<p><strong>Negación (~):</strong> invierte el valor. Si p es V, ~p es F.</p>
-      <p><strong>Conjunción (^):</strong> «p y q» — solo es V si ambas son V.</p>
-      <p><strong>Disyunción (v):</strong> «p o q» — es V si al menos una es V.</p>
-      <p><strong>Condicional (->):</strong> «si p entonces q». Solo es F cuando p es V y q es F.</p>
-      <p><strong>Bicondicional (&lt;-&gt;):</strong> «p si y solo si q» — V cuando p y q tienen el mismo valor.</p>`
+      body: `
+        <p>Combinamos proposiciones con <strong>conectores</strong>:</p>
+        <table class="learn-mini-table">
+          <tr><th>Símbolo</th><th>Nombre</th><th>Idea</th></tr>
+          <tr><td><code>~</code></td><td>NO</td><td>Invierte V↔F</td></tr>
+          <tr><td><code>^</code></td><td>Y</td><td>V solo si las dos son V</td></tr>
+          <tr><td><code>v</code></td><td>O</td><td>V si al menos una es V</td></tr>
+          <tr><td><code>-></code></td><td>Si… entonces</td><td>F solo cuando la primera es V y la segunda F</td></tr>
+          <tr><td><code>&lt;-&gt;</code></td><td>Si y solo si</td><td>V cuando ambas iguales</td></tr>
+        </table>
+        <p class="learn-tip">Usa el teclado virtual en Practicar; el botón ↔ escribe <code>&lt;-&gt;</code> correctamente.</p>
+      `
     },
     {
       id: 'l3',
-      title: 'Tablas de verdad',
-      body: `<p>Una <strong>tabla de verdad</strong> lista todas las combinaciones de V/F de las variables y el resultado de la fórmula.</p>
-      <p>Con 2 variables hay 4 filas; con 3 variables, 8 filas.</p>
-      <p><strong>Clasificación:</strong></p>
-      <ul><li><strong>Tautología:</strong> siempre V.</li><li><strong>Contradicción:</strong> siempre F.</li><li><strong>Contingencia:</strong> mezcla de V y F.</li></ul>`
+      title: 'Tablas de verdad y clasificación',
+      body: `
+        <p>La <strong>tabla de verdad</strong> prueba todas las combinaciones de V/F y muestra el resultado final.</p>
+        <ul>
+          <li><strong>Tautología:</strong> siempre sale V (siempre verdadera).</li>
+          <li><strong>Contradicción:</strong> siempre sale F.</li>
+          <li><strong>Contingencia:</strong> mezcla de V y F (lo más común).</li>
+        </ul>
+        <p>En Practicar generarás la tabla y luego clasificarás el resultado en el mini-reto.</p>
+        <p class="learn-tip">La tabla no te dice la respuesta del reto hasta que tú la interpretas.</p>
+      `
     }
   ],
   sets: [
     {
       id: 's1',
-      title: 'Conjuntos y notación',
-      body: `<p>Un <strong>conjunto</strong> es una colección de elementos distintos. Lo escribimos A = {1, 2, 3}.</p>
-      <p><strong>Pertenencia:</strong> 2 ∈ A significa que 2 está en A.</p>
-      <p>En diagramas de Venn, cada círculo representa un conjunto y los números se ubican en la región correcta.</p>`
+      title: 'Conjuntos y diagrama de Venn',
+      body: `
+        <p>Un <strong>conjunto</strong> es una colección de elementos: A = {1, 2, 3, 4, 5}.</p>
+        <p><strong>∈</strong> significa «pertenece»: 3 ∈ A.</p>
+        <p>En el diagrama de Venn cada círculo es un conjunto; cada número va en la región donde corresponde (solo A, solo B, o en la intersección).</p>
+        <p class="learn-tip">Primero entiendes la idea; en Practicar calcularás y luego colorearás regiones.</p>
+      `
     },
     {
       id: 's2',
-      title: 'Operaciones entre conjuntos',
-      body: `<p><strong>Unión (A ∪ B):</strong> todo lo que está en A, en B, o en ambos.</p>
-      <p><strong>Intersección (A ∩ B):</strong> solo lo que está en A y en B a la vez.</p>
-      <p><strong>Diferencia (A − B):</strong> lo que está en A pero no en B.</p>
-      <p><strong>Diferencia simétrica (A Δ B):</strong> lo que está en uno solo, no en la intersección.</p>`
+      title: 'Operaciones: unión, intersección, diferencia',
+      body: `
+        <p><strong>Unión A ∪ B:</strong> todo lo que está en A o en B (o en ambos).</p>
+        <p><strong>Intersección A ∩ B:</strong> solo lo común a A y B.</p>
+        <p><strong>Diferencia A − B:</strong> lo que está en A pero no en B.</p>
+        <p><strong>Diferencia simétrica A Δ B:</strong> lo que está en uno u otro, pero no en los dos a la vez.</p>
+        <p class="learn-tip">Ejemplo: A = {1,2,3,4,5}, B = {4,5,6,7,8} → A ∩ B = {4, 5}.</p>
+      `
     },
     {
       id: 's3',
-      title: 'Del cálculo al coloreado',
-      body: `<p>Primero <strong>calculas</strong> la operación con tus listas y ves qué elementos forman el resultado.</p>
-      <p>Después, en el desafío, <strong>coloreas</strong> las regiones del diagrama que representan esa operación (sin mirar solo los números).</p>
-      <p>Así conectas la idea abstracta con la imagen visual.</p>`
+      title: 'Aprender y luego colorear',
+      body: `
+        <p>En Practicar hay <strong>dos pasos</strong>:</p>
+        <ol>
+          <li><strong>Calcular:</strong> escribes los elementos de A y B, eliges la operación y ves el resultado numérico.</li>
+          <li><strong>Pon a prueba:</strong> coloreas en el diagrama la operación que te piden (sin mirar solo la lista).</li>
+        </ol>
+        <p>Si vuelves a Repasar, al regresar a Practicar el desafío de coloreado será nuevo.</p>
+      `
     }
   ],
   graphs: [
     {
       id: 'g1',
-      title: 'Grafos: nodos y aristas',
-      body: `<p>Un <strong>grafo</strong> tiene <strong>nodos</strong> (vértices) y <strong>aristas</strong> que los conectan.</p>
-      <p>En redes reales: ciudades = nodos, carreteras = aristas. El <strong>peso</strong> puede ser distancia o tiempo.</p>`
+      title: 'Nodos, aristas y pesos',
+      body: `
+        <p>Un <strong>grafo</strong> modela redes: nodos = lugares, aristas = conexiones, <strong>peso</strong> = costo (km, ms, dinero).</p>
+        <p>Puedes crear tu propio grafo en Practicar o usar el ejemplo cargado.</p>
+        <p class="learn-tip">Más aristas no siempre significa camino más corto: importa la suma de pesos.</p>
+      `
     },
     {
       id: 'g2',
-      title: 'BFS — explorar por capas',
-      body: `<p><strong>BFS</strong> (búsqueda en anchura) visita primero los vecinos del origen, luego los vecinos de esos vecinos.</p>
-      <p>Sirve para saber <em>en qué orden</em> se alcanzan nodos o si hay conexión entre dos puntos.</p>`
+      title: 'BFS — explorar en oleadas',
+      body: `
+        <p><strong>BFS</strong> (búsqueda en anchura) explora «por capas»: primero vecinos del origen, luego vecinos de esos vecinos.</p>
+        <p>Útil para: ¿hay conexión?, orden de visita, redes sociales cercanas.</p>
+        <p class="learn-tip">En Practicar elige un nodo origen y ejecuta BFS para ver el orden en el log.</p>
+      `
     },
     {
       id: 'g3',
-      title: 'Dijkstra — camino más corto',
-      body: `<p><strong>Dijkstra</strong> encuentra el camino de <strong>menor peso total</strong> entre dos nodos (con pesos ≥ 0).</p>
-      <p>Es la base de GPS, rutas en juegos multijugador y redes de datos.</p>`
+      title: 'Dijkstra — el camino más barato',
+      body: `
+        <p><strong>Dijkstra</strong> encuentra el camino de <strong>menor peso total</strong> entre dos nodos (pesos ≥ 0).</p>
+        <p>Base de GPS, rutas en videojuegos y tráfico de datos.</p>
+        <p class="learn-tip">Compara con BFS: Dijkstra optimiza costo, no solo número de saltos.</p>
+      `
     }
   ],
   relations: [
     {
       id: 'r1',
-      title: 'Relaciones en un conjunto',
-      body: `<p>Una <strong>relación R</strong> sobre A es un conjunto de pares ordenados (a, b) con a, b ∈ A.</p>
-      <p>La <strong>matriz de adyacencia</strong> marca con 1 si existe el par (fila → columna).</p>`
+      title: 'Relaciones y pares ordenados',
+      body: `
+        <p>Una <strong>relación R</strong> en A es un conjunto de pares (a, b). Ejemplo: (1,1), (1,2), (2,2).</p>
+        <p>La <strong>matriz</strong> es otra forma de ver lo mismo: fila = origen, columna = destino, 1 = sí hay par.</p>
+        <p class="learn-tip">Puedes editar la matriz haciendo clic o escribir pares en el cuadro de texto.</p>
+      `
     },
     {
       id: 'r2',
-      title: 'Propiedades fundamentales',
-      body: `<p><strong>Reflexiva:</strong> todo elemento se relaciona consigo mismo (a,a).</p>
-      <p><strong>Simétrica:</strong> si (a,b) entonces (b,a).</p>
-      <p><strong>Transitiva:</strong> si (a,b) y (b,c) entonces (a,c).</p>
-      <p><strong>Antisimétrica:</strong> si (a,b) y (b,a) solo cuando a = b.</p>`
+      title: 'Propiedades: reflexiva, simétrica, transitiva',
+      body: `
+        <ul>
+          <li><strong>Reflexiva:</strong> todo se relaciona consigo mismo (a,a).</li>
+          <li><strong>Simétrica:</strong> si (a,b) entonces (b,a).</li>
+          <li><strong>Transitiva:</strong> si (a,b) y (b,c) entonces (a,c).</li>
+          <li><strong>Antisimétrica:</strong> si (a,b) y (b,a) solo cuando a = b.</li>
+        </ul>
+        <p class="learn-tip">No todas las relaciones cumplen todo; depende del contexto (amistad, jerarquía, etc.).</p>
+      `
     },
     {
       id: 'r3',
       title: 'Relación de equivalencia',
-      body: `<p>Si una relación es <strong>reflexiva, simétrica y transitiva</strong>, es de <strong>equivalencia</strong>.</p>
-      <p>Particiona el conjunto en clases (por ejemplo: «misma ciudad»).</p>`
+      body: `
+        <p>Si es <strong>reflexiva + simétrica + transitiva</strong>, es una <strong>equivalencia</strong> (como «misma ciudad» o «mismo resto»).</p>
+        <p>En Practicar verás si tu relación cumple cada propiedad y si es equivalencia.</p>
+      `
     }
   ]
 };

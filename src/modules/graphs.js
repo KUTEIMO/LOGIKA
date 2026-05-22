@@ -5,6 +5,7 @@ import { afterModuleActivity } from '../components/certificates.js';
 import { setGlobalMascotExpression } from '../components/mascot.js';
 import { showToast, isLightMode } from '../components/ui.js';
 import { icon, refreshIcons } from '../components/icons.js';
+import { registerPracticeReset } from '../components/module-learn.js';
 
 export function initGraphsModule() {
   const canvas = document.getElementById('graph-canvas');
@@ -534,6 +535,17 @@ export function initGraphsModule() {
   }
 
   loadDefaultGraph();
+
+  registerPracticeReset('graphs', () => {
+    highlightedNodes = [];
+    highlightedEdges = [];
+    animating = false;
+    connectingNode = null;
+    draggingNode = null;
+    loadDefaultGraph();
+    setLog(`<p>${icon('info', 'text-cyan')} Ejercicio reiniciado — prueba otra ruta.</p>`);
+    setGlobalMascotExpression('normal');
+  });
 
   document.addEventListener('logika-theme-change', () => {
     if (!animating) redraw();

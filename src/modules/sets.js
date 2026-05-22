@@ -4,6 +4,7 @@ import { setGlobalMascotExpression } from '../components/mascot.js';
 import { showToast, isLightMode } from '../components/ui.js';
 import { saveModuleProgress, promptLoginIfNeeded, getModuleProgress } from '../components/progress.js';
 import { afterModuleActivity } from '../components/certificates.js';
+import { registerPracticeReset } from '../components/module-learn.js';
 
 export function initSetsModule() {
   const setAInput = document.getElementById('set-a-input');
@@ -495,5 +496,12 @@ export function initSetsModule() {
 
   document.addEventListener('logika-theme-change', () => {
     drawVennDiagram(null, lastVennGameMode);
+  });
+
+  registerPracticeReset('sets', () => {
+    if (phase === 'practice' || lastVennGameMode) {
+      newGameChallenge();
+      drawVennDiagram(null, true);
+    }
   });
 }

@@ -2224,6 +2224,42 @@ body.user-logged-in .dashboard-guest-panel {
   flex-wrap: wrap;
 }
 
+.learn-tip {
+  margin-top: 1rem;
+  padding: 0.75rem 1rem;
+  border-radius: 10px;
+  border-left: 3px solid var(--secondary);
+  background: rgba(6, 182, 212, 0.08);
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+}
+
+.learn-mini-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 0.75rem 0;
+  font-size: 0.9rem;
+}
+
+.learn-mini-table th,
+.learn-mini-table td {
+  border: 1px solid var(--border-color);
+  padding: 0.4rem 0.6rem;
+  text-align: left;
+}
+
+.school-lesson-panel {
+  margin-bottom: 1rem;
+}
+
+.school-lesson-body {
+  margin: 1rem 0;
+}
+
+.school-challenge-panel .quiz-footer {
+  margin-top: 1rem;
+}
+
 /* Mi ruta */
 .route-page-header,
 .profile-page-header {

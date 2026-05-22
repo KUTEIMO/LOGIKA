@@ -6,6 +6,12 @@ import { showToast } from './ui.js';
 import { icon, refreshIcons } from './icons.js';
 
 const LESSON_XP = 15;
+const practiceResetHandlers = new Map();
+
+/** Registrar reinicio de práctica al volver a Aprender */
+export function registerPracticeReset(moduleId, fn) {
+  practiceResetHandlers.set(moduleId, fn);
+}
 
 export function isLearnPhaseComplete(moduleId) {
   const lessons = getLessonsForModule(moduleId);
@@ -35,20 +41,35 @@ function isLearnCompleteAfter(completed, moduleId) {
   return lessons.every((l) => completed.includes(l.id));
 }
 
-function setModulePhase(moduleId, phase) {
+function resetPracticeState(moduleId) {
+  const n = (getModuleProgress(moduleId).practiceResetCount || 0) + 1;
+  saveModuleProgress(moduleId, { practiceResetCount: n });
+  practiceResetHandlers.get(moduleId)?.();
+  document.dispatchEvent(new CustomEvent('logika-practice-reset', { detail: { moduleId } }));
+}
+
+function setModulePhase(moduleId, phase, options = {}) {
   const view = document.getElementById(`${moduleId}-view`);
   if (!view) return;
+
+  const prev = getModuleProgress(moduleId).currentPhase || 'learn';
+
+  if (prev === 'practice' && phase === 'learn' && !options.skipReset) {
+    resetPracticeState(moduleId);
+  }
 
   const learnMount = view.querySelector(`#${moduleId}-learn-mount`);
   const practiceZone = view.querySelector(`#${moduleId}-practice-zone`);
   const tabLearn = view.querySelector('[data-phase-tab="learn"]');
   const tabPractice = view.querySelector('[data-phase-tab="practice"]');
+  const practiceHint = view.querySelector(`#${moduleId}-practice-hint`);
 
   const isLearn = phase === 'learn';
   learnMount?.classList.toggle('hidden', !isLearn);
   practiceZone?.classList.toggle('hidden', isLearn);
   tabLearn?.classList.toggle('active', isLearn);
   tabPractice?.classList.toggle('active', !isLearn);
+  practiceHint?.classList.toggle('hidden', isLearn);
 
   saveModuleProgress(moduleId, { currentPhase: phase });
 }
@@ -61,20 +82,22 @@ function renderLesson(moduleId, index) {
 
   const done = (getModuleProgress(moduleId).lessonsCompleted || []).includes(lesson.id);
   const total = lessons.length;
+  const allDone = isLearnPhaseComplete(moduleId);
 
   mount.innerHTML = `
     <div class="card card-neon learn-card">
       <div class="learn-card-header">
         <span class="learn-step-badge">Lección ${index + 1} de ${total}</span>
-        ${done ? `<span class="learn-done-badge">${icon('check', 'lk-icon')} Completada</span>` : ''}
+        ${done ? `<span class="learn-done-badge">${icon('check', 'lk-icon')} Vista</span>` : ''}
       </div>
       <h3>${lesson.title}</h3>
       <div class="learn-body">${lesson.body}</div>
       <div class="learn-nav">
         <button type="button" class="btn btn-sm btn-dark btn-learn-prev" ${index === 0 ? 'disabled' : ''}>Anterior</button>
-        ${done
-          ? `<button type="button" class="btn btn-sm btn-primary btn-learn-next">${index < total - 1 ? 'Siguiente lección' : 'Ir a practicar'}</button>`
-          : `<button type="button" class="btn btn-sm btn-primary btn-learn-complete">Entendido — continuar (+${LESSON_XP} XP)</button>`
+        ${!done
+          ? `<button type="button" class="btn btn-sm btn-primary btn-learn-complete">Lo entendí — continuar (+${LESSON_XP} XP)</button>`
+          : `<button type="button" class="btn btn-sm btn-secondary btn-learn-next">${index < total - 1 ? 'Siguiente' : ''}</button>
+             ${allDone ? `<button type="button" class="btn btn-sm btn-primary btn-go-practice">Ir a practicar</button>` : ''}`
         }
       </div>
     </div>
@@ -82,27 +105,28 @@ function renderLesson(moduleId, index) {
 
   refreshIcons(mount);
 
-  mount.querySelector('.btn-learn-prev')?.addEventListener('click', () => {
-    renderLesson(moduleId, index - 1);
-  });
+  mount.querySelector('.btn-learn-prev')?.addEventListener('click', () => renderLesson(moduleId, index - 1));
 
   mount.querySelector('.btn-learn-complete')?.addEventListener('click', () => {
     markLessonDone(moduleId, lesson.id);
     addXP(LESSON_XP, `lesson_${moduleId}_${lesson.id}`);
     playSuccess();
-    showToast(`Lección completada (+${LESSON_XP} XP)`, 'success', 2200);
-    if (isLearnPhaseComplete(moduleId)) {
-      unlockPractice(moduleId);
-      showToast('¡Zona de práctica desbloqueada!', 'success', 3500);
-    }
+    showToast(`+${LESSON_XP} XP · Lección registrada`, 'success', 2000);
+    if (isLearnPhaseComplete(moduleId)) unlockPractice(moduleId);
     renderLesson(moduleId, index);
     updatePhaseTabs(moduleId);
   });
 
   mount.querySelector('.btn-learn-next')?.addEventListener('click', () => {
     if (index < total - 1) renderLesson(moduleId, index + 1);
-    else if (isLearnPhaseComplete(moduleId)) setModulePhase(moduleId, 'practice');
-    else showToast('Marca esta lección como completada primero.', 'warning');
+  });
+
+  mount.querySelector('.btn-go-practice')?.addEventListener('click', () => {
+    if (!isLearnPhaseComplete(moduleId)) {
+      showToast('Completa todas las lecciones primero.', 'warning');
+      return;
+    }
+    setModulePhase(moduleId, 'practice');
   });
 }
 
@@ -111,13 +135,23 @@ function unlockPractice(moduleId) {
   const tabPractice = view?.querySelector('[data-phase-tab="practice"]');
   tabPractice?.removeAttribute('disabled');
   tabPractice?.classList.remove('locked');
+  view?.querySelector(`#${moduleId}-practice-hint`)?.classList.remove('hidden');
+  updatePhaseTabs(moduleId);
 }
 
 function updatePhaseTabs(moduleId) {
   const view = document.getElementById(`${moduleId}-view`);
   const learnPct = getLearnProgressPercent(moduleId);
   const labelLearn = view?.querySelector('.phase-label-learn');
-  if (labelLearn) labelLearn.textContent = `Aprender (${learnPct}%)`;
+  const labelPractice = view?.querySelector('.phase-label-practice');
+  if (labelLearn) {
+    labelLearn.textContent = isLearnPhaseComplete(moduleId)
+      ? `Repasar (${learnPct}%)`
+      : `Aprender (${learnPct}%)`;
+  }
+  if (labelPractice) {
+    labelPractice.textContent = isLearnPhaseComplete(moduleId) ? 'Practicar' : 'Practicar (bloqueado)';
+  }
 }
 
 export function initModulePhases(moduleId) {
@@ -135,9 +169,12 @@ export function initModulePhases(moduleId) {
         <i data-lucide="book-open" class="lk-icon"></i> <span class="phase-label-learn">Aprender</span>
       </button>
       <button type="button" class="module-phase-tab locked" data-phase-tab="practice" disabled>
-        <i data-lucide="flask-conical" class="lk-icon"></i> Practicar
+        <i data-lucide="flask-conical" class="lk-icon"></i> <span class="phase-label-practice">Practicar</span>
       </button>
     </nav>
+    <p class="module-phase-hint text-small text-muted hidden" id="${moduleId}-practice-hint">
+      <i data-lucide="info" class="lk-icon"></i> Puedes volver a <strong>Repasar</strong> cuando quieras. Si sales de Practicar, el ejercicio se reiniciará.
+    </p>
     <div id="${moduleId}-learn-mount" class="module-learn-mount"></div>
   `;
 
@@ -153,30 +190,31 @@ export function initModulePhases(moduleId) {
   if (isLearnPhaseComplete(moduleId)) {
     unlockPractice(moduleId);
     const savedPhase = getModuleProgress(moduleId).currentPhase;
-    setModulePhase(moduleId, savedPhase === 'practice' ? 'practice' : 'learn');
+    setModulePhase(moduleId, savedPhase === 'practice' ? 'practice' : 'learn', { skipReset: true });
   } else {
-    setModulePhase(moduleId, 'learn');
+    setModulePhase(moduleId, 'learn', { skipReset: true });
   }
 
   view.querySelector('[data-phase-tab="learn"]')?.addEventListener('click', () => {
-    setModulePhase(moduleId, 'learn');
     const lessons = getLessonsForModule(moduleId);
     const done = (getModuleProgress(moduleId).lessonsCompleted || []).length;
-    renderLesson(moduleId, Math.min(done, lessons.length - 1));
+    setModulePhase(moduleId, 'learn');
+    renderLesson(moduleId, Math.min(Math.max(0, done - 1), lessons.length - 1));
   });
 
   view.querySelector('[data-phase-tab="practice"]')?.addEventListener('click', () => {
     if (!isLearnPhaseComplete(moduleId)) {
-      showToast('Completa todas las lecciones antes de practicar.', 'warning');
+      showToast('Termina las lecciones de Aprender primero.', 'warning');
       return;
     }
     setModulePhase(moduleId, 'practice');
+    document.dispatchEvent(new CustomEvent('logika-practice-enter', { detail: { moduleId } }));
   });
 
   const lessons = getLessonsForModule(moduleId);
   const startIdx = Math.min(
-    (getModuleProgress(moduleId).lessonsCompleted || []).length,
-    Math.max(0, lessons.length - 1)
+    Math.max(0, (getModuleProgress(moduleId).lessonsCompleted || []).length - 1),
+    lessons.length - 1
   );
   renderLesson(moduleId, startIdx);
   updatePhaseTabs(moduleId);

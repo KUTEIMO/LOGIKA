@@ -16,13 +16,15 @@ function buildCyberEyes(expression, uid) {
   const ly = 58;
   const filter = `url(#eyeGlow-${uid})`;
 
-  if (expression === 'happy') {
+  if (expression === 'happy' || expression === 'friendly') {
+    const arcY = expression === 'happy' ? 51 : 52;
+    const strokeW = expression === 'happy' ? 3.5 : 3;
     return `
       <g class="mascot-eye-l mascot-eye-gaze">
-        <path d="M 30,58 Q 38,51 46,58" fill="none" stroke="${glow}" stroke-width="3.5" stroke-linecap="round" filter="${filter}"/>
+        <path d="M 30,58 Q 38,${arcY} 46,58" fill="none" stroke="${glow}" stroke-width="${strokeW}" stroke-linecap="round" filter="${filter}"/>
       </g>
       <g class="mascot-eye-r mascot-eye-gaze">
-        <path d="M 74,58 Q 82,51 90,58" fill="none" stroke="${glow}" stroke-width="3.5" stroke-linecap="round" filter="${filter}"/>
+        <path d="M 74,58 Q 82,${arcY} 90,58" fill="none" stroke="${glow}" stroke-width="${strokeW}" stroke-linecap="round" filter="${filter}"/>
       </g>
     `;
   }
@@ -67,6 +69,10 @@ const createMascotSVG = (containerId, expression = 'normal') => {
     case 'happy':
       eyeColor = 'var(--mascot-eye-happy, #10b981)';
       mouthPath = 'M 48,72 Q 60,86 72,72';
+      break;
+    case 'friendly':
+      eyeColor = 'var(--mascot-eye, #06b6d4)';
+      mouthPath = 'M 50,74 Q 60,80 70,74';
       break;
     case 'sad':
       eyeColor = 'var(--mascot-eye-sad, #ef4444)';
@@ -156,6 +162,7 @@ document.addEventListener('logika-theme-change', () => {
 
 const HUMAN_MESSAGES = {
   happy: '¡Lo lograste! Me alegra ver ese avance.',
+  friendly: 'Hola, soy Logiko. Te acompaño en esta aventura, sin prisa.',
   sad: 'Tranqui, equivocarse también enseña. Vuelve a intentarlo.',
   thoughtful: 'Vamos paso a paso. Revisa la pista y prueba otra vez.',
   surprised: '¡Wow! Ese resultado sí que llama la atención.',

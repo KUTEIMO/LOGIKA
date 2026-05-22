@@ -172,7 +172,7 @@
       <div class="dashboard-header">
         <div class="welcome-banner" id="dashboard-welcome-guest">
           <h2><i data-lucide="book-open" class="lk-icon section-icon" aria-hidden="true"></i> Panel de Módulos Académicos</h2>
-          <p>Explora los módulos y gana XP. Los <strong>certificados (PNG/PDF)</strong> se desbloquean al <strong>completar cada módulo</strong> o al alcanzar hitos de experiencia — no en cada mini-reto.</p>
+          <p>Explora los módulos, repasa con <strong>Aprender</strong> y practica cuando quieras. Los certificados se desbloquean al completar cada módulo.</p>
         </div>
         <div class="welcome-banner account-banner hidden" id="dashboard-welcome-user">
           <h2>Hola, estudiante LOGIKA</h2>
@@ -185,7 +185,7 @@
       </div>
 
       <div class="dashboard-guest-panel card card-neon" id="dashboard-guest-panel">
-        <p><i data-lucide="user-plus" class="lk-icon"></i> <strong>Modo invitado:</strong> puedes estudiar y practicar en este dispositivo. <button type="button" class="btn btn-link btn-sm" id="dashboard-cta-login">Inicia sesión</button> para <strong>Mi ruta</strong>, perfil en la nube, certificados PDF y rankings (próximamente).</p>
+        <p><i data-lucide="log-in" class="lk-icon"></i> ¿Quieres seguir en otro dispositivo? <button type="button" class="btn btn-link btn-sm" id="dashboard-cta-login">Inicia sesión</button> y guarda tu progreso.</p>
       </div>
 
       <div class="dashboard-logged-cta card card-neon hidden" id="dashboard-logged-cta">
@@ -312,8 +312,7 @@
           </div>
           <div class="gamified-route-box">
             <h4><i data-lucide="map-pin" class="lk-icon" aria-hidden="true"></i> La Ruta del Programador (Grados 9, 10 y 11)</h4>
-            <p>Juega los 3 mini-retos interactivos con <strong>Logiko</strong> para ver cómo se aplican las matemáticas
-              discretas en la programación real. ¡Obtén tu medalla virtual de la Unisimón!</p>
+            <p><strong>Logiko</strong> te enseña tres ideas clave (lógica, conjuntos y grafos) y luego te propone un reto corto en cada una. ¡Al terminar, tu medalla virtual!</p>
 
             <div class="school-cta-card" id="school-cta-card">
               <p class="school-cta-lead"><i data-lucide="graduation-cap" class="lk-icon" aria-hidden="true"></i>
@@ -354,8 +353,7 @@
         <div class="school-mascot-area">
           <div class="card-mascot-speech">
             <div class="speech-bubble">
-              <p id="school-mascot-bubble">¡Hola! Soy <strong>Logiko</strong>. Te guiaré en esta aventura de sistemas.
-                ¿Sabías que los mapas de Google funcionan gracias a la teoría de Grafos? ¡Pruébalo conmigo!</p>
+              <p id="school-mascot-bubble"><i data-lucide="bot" class="lk-icon" aria-hidden="true"></i> ¡Hola! Soy <strong>Logiko</strong>. Primero te explico la idea en sencillo y después jugamos un reto. ¡Sin presión, vamos paso a paso!</p>
             </div>
             <div class="mascot-container-school" id="mascot-school-container">
               <!-- Inline SVG mascot loaded here -->
@@ -370,9 +368,18 @@
           <div class="quiz-progress-fill" id="school-quiz-progress" style="width: 33%;"></div>
         </div>
         <div class="school-quiz-card">
+          <div class="school-lesson-panel" id="school-lesson-panel">
+            <span class="step-indicator" id="school-lesson-step">Etapa 1 de 3</span>
+            <h4 id="school-lesson-title">Lección</h4>
+            <div class="learn-body school-lesson-body" id="school-lesson-body"></div>
+            <button type="button" class="btn btn-primary btn-block mt-3" id="btn-school-to-challenge">
+              <i data-lucide="zap" class="lk-icon"></i> ¡Listo! Ir al reto
+            </button>
+          </div>
+          <div class="school-challenge-panel hidden" id="school-challenge-panel">
           <div class="quiz-header">
             <span class="step-indicator" id="school-quiz-step">Reto 1 de 3</span>
-            <h4 id="school-quiz-title">Lógica de Programación: El Enigma del Robot</h4>
+            <h4 id="school-quiz-title">Reto</h4>
           </div>
           <div class="quiz-body" id="school-quiz-body">
             <!-- Quiz questions loaded dynamically -->
@@ -386,6 +393,7 @@
             <div class="quiz-feedback-text text-green hidden" id="quiz-feedback">¡Respuesta correcta!</div>
             <button class="btn btn-secondary hidden" id="btn-quiz-explanation">Ver por qué</button>
             <button class="btn btn-primary" id="btn-school-quiz-next">Verificar Respuesta</button>
+          </div>
           </div>
         </div>
       </div>

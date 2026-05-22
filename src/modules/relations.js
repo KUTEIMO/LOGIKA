@@ -4,6 +4,7 @@ import { saveModuleProgress, getModuleProgress } from '../components/progress.js
 import { afterModuleActivity } from '../components/certificates.js';
 import { setGlobalMascotExpression } from '../components/mascot.js';
 import { icon, refreshIcons } from '../components/icons.js';
+import { registerPracticeReset } from '../components/module-learn.js';
 
 export function initRelationsModule() {
   const setInput = document.getElementById('relation-set-input');
@@ -239,4 +240,12 @@ export function initRelationsModule() {
     const pairsStr = currentPairs.map(p => `(${p.u},${p.v})`).join(', ');
     pairsInput.value = pairsStr;
   }
+
+  registerPracticeReset('relations', () => {
+    setInput.value = '1, 2, 3, 4';
+    pairsInput.value = '(1,1), (1,2), (2,2), (3,4)';
+    updateElementsAndBuildMatrix();
+    parseTextPairsAndCalculate();
+    setGlobalMascotExpression('normal');
+  });
 }

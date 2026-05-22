@@ -4,6 +4,7 @@ import { setGlobalMascotExpression, showMascotSpeech } from '../components/masco
 import { showToast, clearLogicError, showLogicError } from '../components/ui.js';
 import { saveModuleProgress, promptLoginIfNeeded, getModuleProgress } from '../components/progress.js';
 import { afterModuleActivity } from '../components/certificates.js';
+import { registerPracticeReset } from '../components/module-learn.js';
 
 /** Fórmulas de ejemplo (evita "<->" roto en atributos HTML) */
 export const LOGIC_EXAMPLES = {
@@ -406,4 +407,16 @@ export function initLogicModule() {
       quizChoicesContainer.appendChild(btn);
     });
   }
+
+  registerPracticeReset('logic', () => {
+    formulaInput.value = '';
+    resultContainer.classList.add('hidden');
+    placeholder.classList.remove('hidden');
+    classificationBadge?.classList.add('hidden');
+    quizChoicesContainer.innerHTML = '';
+    currentQuizAnswer = '';
+    quizAnswered = false;
+    clearLogicError();
+    setGlobalMascotExpression('normal');
+  });
 }
