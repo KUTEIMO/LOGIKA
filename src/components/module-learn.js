@@ -1,5 +1,11 @@
 // Zona de aprendizaje + pestañas Aprender / Practicar por módulo
-import { getLessonsForModule } from '../config/module-lessons.js';
+import {
+  getLessonsForModule,
+  isUserLoggedIn,
+  getGuestComplexity,
+  setGuestComplexity,
+  COMPLEXITY_OPTIONS
+} from '../config/learning-mode.js';
 import { getModuleProgress, saveModuleProgress } from './progress.js';
 import { addXP, playSuccess } from './gamification.js';
 import { showToast } from './ui.js';
@@ -8,7 +14,6 @@ import { icon, refreshIcons } from './icons.js';
 const LESSON_XP = 15;
 const practiceResetHandlers = new Map();
 
-/** Registrar reinicio de práctica al volver a Aprender */
 export function registerPracticeReset(moduleId, fn) {
   practiceResetHandlers.set(moduleId, fn);
 }
@@ -63,15 +68,93 @@ function setModulePhase(moduleId, phase, options = {}) {
   const tabLearn = view.querySelector('[data-phase-tab="learn"]');
   const tabPractice = view.querySelector('[data-phase-tab="practice"]');
   const practiceHint = view.querySelector(`#${moduleId}-practice-hint`);
+  const lessonRoute = view.querySelector(`#${moduleId}-lesson-route`);
 
   const isLearn = phase === 'learn';
   learnMount?.classList.toggle('hidden', !isLearn);
   practiceZone?.classList.toggle('hidden', isLearn);
+  lessonRoute?.classList.toggle('hidden', !isLearn);
   tabLearn?.classList.toggle('active', isLearn);
   tabPractice?.classList.toggle('active', !isLearn);
   practiceHint?.classList.toggle('hidden', isLearn);
 
   saveModuleProgress(moduleId, { currentPhase: phase });
+}
+
+function renderLessonRouteNav(moduleId, activeIndex) {
+  const view = document.getElementById(`${moduleId}-view`);
+  const nav = view?.querySelector(`#${moduleId}-lesson-route`);
+  if (!nav) return;
+
+  const lessons = getLessonsForModule(moduleId);
+  const done = getModuleProgress(moduleId).lessonsCompleted || [];
+
+  let html = `<p class="lesson-route-title">${icon('route', 'lk-icon')} Ruta de lecciones</p><div class="lesson-route-pills">`;
+  const firstPending = lessons.findIndex((l) => !done.includes(l.id));
+  lessons.forEach((lesson, i) => {
+    const completed = done.includes(lesson.id);
+    const active = i === activeIndex;
+    const canOpen = completed || (firstPending !== -1 && i === firstPending);
+    html += `
+      <button type="button" class="lesson-route-pill ${active ? 'active' : ''} ${completed ? 'done' : ''} ${!canOpen ? 'locked' : ''}"
+        data-lesson-index="${i}" ${!canOpen ? 'disabled' : ''}>
+        ${completed ? icon('circle-check', 'lk-icon') : icon('book-open', 'lk-icon')}
+        <span>${i + 1}. ${lesson.title}</span>
+      </button>
+    `;
+  });
+  html += '</div>';
+  nav.innerHTML = html;
+  refreshIcons(nav);
+
+  nav.querySelectorAll('.lesson-route-pill:not(.locked)').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const idx = parseInt(btn.getAttribute('data-lesson-index'), 10);
+      renderLesson(moduleId, idx);
+    });
+  });
+}
+
+function renderGuestComplexityBar(moduleId) {
+  const view = document.getElementById(`${moduleId}-view`);
+  const bar = view?.querySelector(`#${moduleId}-complexity-bar`);
+  if (!bar) return;
+  if (isUserLoggedIn()) {
+    bar.classList.add('hidden');
+    return;
+  }
+  bar.classList.remove('hidden');
+  const current = getGuestComplexity();
+  bar.innerHTML = `
+    <label class="complexity-label" for="${moduleId}-complexity-select">${icon('sliders-horizontal', 'lk-icon')} Complejidad del módulo</label>
+    <select id="${moduleId}-complexity-select" class="set-input complexity-select">
+      ${COMPLEXITY_OPTIONS.map(
+        (o) => `<option value="${o.id}" ${o.id === current ? 'selected' : ''}>${o.label}</option>`
+      ).join('')}
+    </select>
+    <p class="text-small text-muted complexity-hint" id="${moduleId}-complexity-hint"></p>
+  `;
+  const hint = bar.querySelector(`#${moduleId}-complexity-hint`);
+  const select = bar.querySelector(`#${moduleId}-complexity-select`);
+  const updateHint = () => {
+    const opt = COMPLEXITY_OPTIONS.find((o) => o.id === select.value);
+    if (hint && opt) hint.textContent = opt.hint;
+  };
+  updateHint();
+  select?.addEventListener('change', () => {
+    setGuestComplexity(select.value);
+    saveModuleProgress(moduleId, { complexity: select.value });
+    updateHint();
+    const done = (getModuleProgress(moduleId).lessonsCompleted || []).filter((id) =>
+      getLessonsForModule(moduleId).some((l) => l.id === id)
+    );
+    saveModuleProgress(moduleId, { lessonsCompleted: done, learnComplete: false });
+    renderLesson(moduleId, 0);
+    updatePhaseTabs(moduleId);
+    document.dispatchEvent(new CustomEvent('logika-complexity-change'));
+    showToast('Complejidad actualizada. La práctica usará retos acordes.', 'info', 2800);
+  });
+  refreshIcons(bar);
 }
 
 function renderLesson(moduleId, index) {
@@ -104,6 +187,7 @@ function renderLesson(moduleId, index) {
   `;
 
   refreshIcons(mount);
+  renderLessonRouteNav(moduleId, index);
 
   mount.querySelector('.btn-learn-prev')?.addEventListener('click', () => renderLesson(moduleId, index - 1));
 
@@ -127,6 +211,7 @@ function renderLesson(moduleId, index) {
       return;
     }
     setModulePhase(moduleId, 'practice');
+    document.dispatchEvent(new CustomEvent('logika-practice-enter', { detail: { moduleId } }));
   });
 }
 
@@ -172,9 +257,11 @@ export function initModulePhases(moduleId) {
         <i data-lucide="flask-conical" class="lk-icon"></i> <span class="phase-label-practice">Practicar</span>
       </button>
     </nav>
+    <div class="module-complexity-bar hidden" id="${moduleId}-complexity-bar"></div>
     <p class="module-phase-hint text-small text-muted hidden" id="${moduleId}-practice-hint">
-      <i data-lucide="info" class="lk-icon"></i> Puedes volver a <strong>Repasar</strong> cuando quieras. Si sales de Practicar, el ejercicio se reiniciará.
+      <i data-lucide="info" class="lk-icon"></i> Puedes volver a <strong>Repasar</strong> y abrir cualquier lección ya vista. Si sales de Practicar, el ejercicio se reiniciará.
     </p>
+    <div class="lesson-route-nav hidden" id="${moduleId}-lesson-route" aria-label="Lecciones del módulo"></div>
     <div id="${moduleId}-learn-mount" class="module-learn-mount"></div>
   `;
 
@@ -187,6 +274,8 @@ export function initModulePhases(moduleId) {
 
   view.dataset.phasesInit = '1';
 
+  renderGuestComplexityBar(moduleId);
+
   if (isLearnPhaseComplete(moduleId)) {
     unlockPractice(moduleId);
     const savedPhase = getModuleProgress(moduleId).currentPhase;
@@ -196,10 +285,11 @@ export function initModulePhases(moduleId) {
   }
 
   view.querySelector('[data-phase-tab="learn"]')?.addEventListener('click', () => {
-    const lessons = getLessonsForModule(moduleId);
-    const done = (getModuleProgress(moduleId).lessonsCompleted || []).length;
     setModulePhase(moduleId, 'learn');
-    renderLesson(moduleId, Math.min(Math.max(0, done - 1), lessons.length - 1));
+    const lessons = getLessonsForModule(moduleId);
+    const done = getModuleProgress(moduleId).lessonsCompleted || [];
+    const lastDoneIdx = lessons.reduce((acc, l, i) => (done.includes(l.id) ? i : acc), 0);
+    renderLesson(moduleId, lastDoneIdx);
   });
 
   view.querySelector('[data-phase-tab="practice"]')?.addEventListener('click', () => {
@@ -212,11 +302,9 @@ export function initModulePhases(moduleId) {
   });
 
   const lessons = getLessonsForModule(moduleId);
-  const startIdx = Math.min(
-    Math.max(0, (getModuleProgress(moduleId).lessonsCompleted || []).length - 1),
-    lessons.length - 1
-  );
-  renderLesson(moduleId, startIdx);
+  const done = getModuleProgress(moduleId).lessonsCompleted || [];
+  const lastDoneIdx = lessons.reduce((acc, l, i) => (done.includes(l.id) ? i : acc), 0);
+  renderLesson(moduleId, lastDoneIdx);
   updatePhaseTabs(moduleId);
   refreshIcons(shell);
 }

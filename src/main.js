@@ -33,7 +33,9 @@ import { initTheme, showToast, showModal } from './components/ui.js';
 import { initIcons, refreshIcons, icon } from './components/icons.js';
 import { initFirebase, syncSchoolLead, syncUserProgress } from './services/firebase.js';
 import { exportLeadPayload } from './components/profile.js';
-import { buildProgressPayload, offerModuleResume, promptLoginIfNeeded } from './components/progress.js';
+import { buildProgressPayload, offerModuleResume, promptLoginIfNeeded, onUserLogin, onUserLogout } from './components/progress.js';
+import { canOpenModule } from './config/learning-mode.js';
+import { tryOpenModuleFromDashboard } from './components/dashboard-ui.js';
 import { tryAwardSpecialCertificate } from './components/certificates.js';
 import { refreshDashboardUI } from './components/dashboard-ui.js';
 import { refreshLearningRouteView, refreshRouteSummary } from './components/learning-route-ui.js';
@@ -112,6 +114,9 @@ document.addEventListener('DOMContentLoaded', () => {
     } else if (targetViewId === 'dashboard-view') {
       setGlobalMascotExpression('happy', { speak: false });
       refreshDashboardUI();
+      if (getProgress().isLoggedIn) {
+        refreshLearningRouteView();
+      }
     } else if (targetViewId === 'learning-route-view') {
       refreshRouteSummary();
       refreshLearningRouteView();
@@ -215,6 +220,10 @@ document.addEventListener('DOMContentLoaded', () => {
   };
 
   function openModule(mod) {
+    if (!canOpenModule(mod)) {
+      showToast('Este módulo está bloqueado. Completa el anterior en Mi ruta.', 'warning');
+      return;
+    }
     initModulePhases(mod);
     navigateTo(`${mod}-view`);
   }
@@ -239,6 +248,10 @@ document.addEventListener('DOMContentLoaded', () => {
     btn.addEventListener('click', () => {
       const mod = btn.getAttribute('data-module');
       playClick();
+      if (!tryOpenModuleFromDashboard(mod)) {
+        showToast('Completa el módulo anterior para desbloquear este.', 'warning');
+        return;
+      }
       if (!hasPlayerNickname()) {
         openNicknameModal(mod);
         return;
@@ -247,9 +260,14 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
+  document.addEventListener('logika-complexity-change', () => {
+    refreshDashboardUI();
+  });
+
   // User Profile actions
   document.getElementById('btn-logout').addEventListener('click', () => {
     playClick();
+    onUserLogout();
     logoutUser();
     refreshDashboardUI();
     refreshRouteSummary();
@@ -279,6 +297,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const mode = document.querySelector('input[name="auth-mode"]:checked').value;
     
     localStorage.setItem('logika_auth_email', email);
+    onUserLogin(email);
 
     if (mode === 'register') {
       if (!usernameInput) {
