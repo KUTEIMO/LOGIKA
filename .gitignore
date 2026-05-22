@@ -1,0 +1,10 @@
+node_modules/
+dist/
+.env
+.env.local
+.env.*.local
+*firebase-adminsdk*.json
+logika-cad29-firebase-adminsdk*.json
+serviceAccountKey.json
+.DS_Store
+.firebase/

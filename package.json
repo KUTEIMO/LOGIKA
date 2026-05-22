@@ -1,0 +1,23 @@
+{
+  "name": "discretas-web-logika",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "deploy:rules": "npx firebase deploy --only firestore:rules",
+    "deploy:hosting": "npm run build && npx firebase deploy --only hosting",
+    "deploy": "npm run build && npx firebase deploy"
+  },
+  "devDependencies": {
+    "firebase-tools": "^14.0.0",
+    "vite": "^5.2.0"
+  },
+  "dependencies": {
+    "firebase": "^12.13.0",
+    "jspdf": "^4.2.1",
+    "lucide": "^1.16.0"
+  }
+}

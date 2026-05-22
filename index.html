@@ -1,0 +1,841 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LOGIKA - Matemáticas Discretas Interactivas</title>
+  <!-- SEO Tags -->
+  <meta name="description"
+    content="LOGIKA es una plataforma web interactiva y gamificada para el aprendizaje de Matemáticas Discretas. Diseñada para Ingeniería de Sistemas de la Universidad Simón Bolívar Sede Cúcuta.">
+  <meta name="keywords"
+    content="matematica discreta, logica proposicional, teoria de conjuntos, grafos, relaciones binarias, unisimón, cucuta, ingenieria de sistemas">
+  <!-- Google Fonts: Sora e Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Sora:wght@400;600;700;800&display=swap"
+    rel="stylesheet">
+  <!-- Lucide Icons (line art, via JS) -->
+  <!-- Custom CSS -->
+  <link rel="stylesheet" href="./src/style.css">
+</head>
+
+<body class="cyber-dark">
+  <!-- Background Elements -->
+  <div class="stars-bg"></div>
+  <div class="glow-orb-1"></div>
+  <div class="glow-orb-2"></div>
+
+  <!-- Header / Navigation Bar -->
+  <header class="cyber-header" id="app-header">
+    <div class="header-container">
+      <div class="logo-area" id="btn-logo">
+        <span class="logo-icon"><i data-lucide="brain" class="lk-icon" aria-hidden="true"></i></span>
+        <h1 class="logo-text">LOGIKA</h1>
+      </div>
+
+      <nav class="nav-links">
+        <button class="nav-btn active" data-target="landing-view"><i data-lucide="home" class="lk-icon" aria-hidden="true"></i> Inicio</button>
+        <button class="nav-btn" data-target="dashboard-view" id="nav-btn-dashboard"><i data-lucide="layout-grid" class="lk-icon" aria-hidden="true"></i>
+          Módulos</button>
+        <button class="nav-btn nav-logged-only hidden" data-target="learning-route-view" id="nav-btn-route"><i data-lucide="route" class="lk-icon" aria-hidden="true"></i> Mi ruta</button>
+        <button class="nav-btn nav-logged-only hidden" data-target="profile-view" id="nav-btn-profile"><i data-lucide="circle-user" class="lk-icon" aria-hidden="true"></i> Mi perfil</button>
+        <button class="nav-btn highlight" data-target="school-view"><i data-lucide="graduation-cap" class="lk-icon" aria-hidden="true"></i> Colegio
+          Invitado</button>
+        <button class="nav-btn" data-target="about-view"><i data-lucide="info" class="lk-icon" aria-hidden="true"></i> Nosotros</button>
+      </nav>
+
+      <div class="user-panel" id="user-header-panel">
+        <button type="button" class="theme-toggle-btn" id="btn-theme-toggle"
+          aria-label="Activar modo claro" title="Activar modo claro" role="switch" aria-checked="false">
+          <i data-lucide="sun" class="lk-icon" aria-hidden="true"></i>
+        </button>
+        <div class="stat-badge xp-badge" title="Tus Puntos de Experiencia (XP)">
+          <i data-lucide="star" class="lk-icon text-yellow" aria-hidden="true"></i> <span id="header-xp">0</span> XP
+        </div>
+        <div class="stat-badge streak-badge" title="Racha de Días Activos">
+          <i data-lucide="flame" class="lk-icon text-orange" aria-hidden="true"></i> <span id="header-streak">0</span> días
+        </div>
+        <button class="login-action-btn" id="btn-login-view"><i data-lucide="user" class="lk-icon" aria-hidden="true"></i> Iniciar
+          Sesión</button>
+        <div class="user-profile-menu hidden" id="user-profile-summary">
+          <span class="user-avatar"><i data-lucide="circle-user" class="lk-icon" aria-hidden="true"></i></span>
+          <span class="user-name" id="header-username">Estudiante</span>
+          <button class="logout-btn" id="btn-logout" title="Cerrar sesión"><i
+              data-lucide="log-out" class="lk-icon"></i></button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content Area (Views) -->
+  <main class="main-content">
+
+    <!-- 1. LANDING VIEW -->
+    <section class="view active" id="landing-view">
+      <div class="hero-section">
+        <div class="hero-info">
+          <span class="badge-accent">Universidad Simón Bolívar · Sede Cúcuta</span>
+          <h2><i data-lucide="rocket" class="lk-icon section-icon" aria-hidden="true"></i> Domina las Matemáticas Discretas de forma interactiva</h2>
+          <p>LOGIKA es la plataforma gamificada diseñada para estudiantes de Ingeniería de Sistemas. Aprende lógica,
+            conjuntos, grafos y relaciones mediante retos prácticos, simulaciones y con la guía de tu compañero digital,
+            <strong>Logiko</strong>.</p>
+          <div class="hero-actions">
+            <button class="btn btn-primary" id="btn-start-playing"><i data-lucide="play" class="lk-icon" aria-hidden="true"></i> Comenzar
+              Retos</button>
+            <button class="btn btn-secondary" id="btn-guest-trial"><i data-lucide="rocket" class="lk-icon" aria-hidden="true"></i> Modo de
+              Prueba</button>
+          </div>
+        </div>
+        <div class="hero-visual">
+          <div class="mascot-landing-wrapper" id="mascot-landing-placeholder">
+            <!-- Will contain interactive mascot -->
+          </div>
+        </div>
+      </div>
+
+      <!-- Feature Highlights -->
+      <div class="features-grid">
+        <div class="feature-card">
+          <div class="card-icon"><i data-lucide="sigma" class="lk-icon" aria-hidden="true"></i></div>
+          <h3>Simulaciones Reales</h3>
+          <p>Visualiza grafos, colorea diagramas de Venn en tiempo real y genera tablas de verdad de forma interactiva.
+          </p>
+        </div>
+        <div class="feature-card">
+          <div class="card-icon"><i data-lucide="gamepad-2" class="lk-icon" aria-hidden="true"></i></div>
+          <h3>Gamificación Pura</h3>
+          <p>Gana XP, mantén tu racha de estudio diaria, sube de nivel y desbloquea logros con cada reto superado.</p>
+        </div>
+        <div class="feature-card">
+          <div class="card-icon"><i data-lucide="terminal" class="lk-icon" aria-hidden="true"></i></div>
+          <h3>Modo Colegio</h3>
+          <p>Descubre cómo la matemática discreta es la base para desarrollar Inteligencia Artificial, videojuegos y
+            ciberseguridad.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 2. LOGIN VIEW -->
+    <section class="view" id="login-view">
+      <div class="auth-wrapper">
+        <div class="auth-card">
+          <div class="auth-header">
+            <h3>Bienvenido a LOGIKA</h3>
+            <p>Inicia sesión o crea una cuenta para guardar tus puntos de XP, nivel y rachas.</p>
+          </div>
+          <form id="auth-form">
+            <div class="form-group">
+              <label for="auth-email">Correo Electrónico</label>
+              <div class="input-wrapper">
+                <i data-lucide="mail" class="lk-icon" aria-hidden="true"></i>
+                <input type="email" id="auth-email" placeholder="ejemplo@unisimon.edu.co" required>
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="auth-username">Nombre de Usuario (para registro)</label>
+              <div class="input-wrapper">
+                <i data-lucide="user" class="lk-icon" aria-hidden="true"></i>
+                <input type="text" id="auth-username" placeholder="TuNombre123">
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="auth-password">Contraseña</label>
+              <div class="input-wrapper">
+                <i data-lucide="lock" class="lk-icon" aria-hidden="true"></i>
+                <input type="password" id="auth-password" placeholder="••••••••" required>
+              </div>
+            </div>
+            <div class="auth-mode-selector">
+              <label class="radio-container">
+                <input type="radio" name="auth-mode" value="login" checked>
+                <span class="checkmark"></span> Iniciar Sesión
+              </label>
+              <label class="radio-container">
+                <input type="radio" name="auth-mode" value="register">
+                <span class="checkmark"></span> Registrarse
+              </label>
+            </div>
+            <button type="submit" class="btn btn-primary btn-block" id="btn-auth-submit">Entrar a la Plataforma</button>
+          </form>
+          <div class="auth-footer">
+            <button class="btn-link" id="btn-auth-guest"><i data-lucide="eye" class="lk-icon" aria-hidden="true"></i> Seguir como invitado sin
+              registrarse</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3. DASHBOARD VIEW -->
+    <section class="view" id="dashboard-view">
+      <div class="dashboard-header">
+        <div class="welcome-banner" id="dashboard-welcome-guest">
+          <h2><i data-lucide="book-open" class="lk-icon section-icon" aria-hidden="true"></i> Panel de Módulos Académicos</h2>
+          <p>Explora los módulos y gana XP. Los <strong>certificados (PNG/PDF)</strong> se desbloquean al <strong>completar cada módulo</strong> o al alcanzar hitos de experiencia — no en cada mini-reto.</p>
+        </div>
+        <div class="welcome-banner account-banner hidden" id="dashboard-welcome-user">
+          <h2>Hola, estudiante LOGIKA</h2>
+          <p>Entra a tus módulos o abre <strong>Mi ruta</strong> para ver lecciones, práctica y certificados.</p>
+          <div class="dashboard-quick-links">
+            <button type="button" class="btn btn-sm btn-primary" data-target="learning-route-view" id="dash-link-route"><i data-lucide="route" class="lk-icon"></i> Mi ruta y progreso</button>
+            <button type="button" class="btn btn-sm btn-secondary" data-target="profile-view" id="dash-link-profile"><i data-lucide="circle-user" class="lk-icon"></i> Ver perfil</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="dashboard-guest-panel card card-neon" id="dashboard-guest-panel">
+        <p><i data-lucide="user-plus" class="lk-icon"></i> <strong>Modo invitado:</strong> puedes estudiar y practicar en este dispositivo. <button type="button" class="btn btn-link btn-sm" id="dashboard-cta-login">Inicia sesión</button> para <strong>Mi ruta</strong>, perfil en la nube, certificados PDF y rankings (próximamente).</p>
+      </div>
+
+      <div class="dashboard-logged-cta card card-neon hidden" id="dashboard-logged-cta">
+        <p class="text-small text-muted">La ruta de aprendizaje (lecciones → práctica → certificado) está en <strong>Mi ruta</strong>, no en esta pantalla.</p>
+      </div>
+
+      <div class="modules-grid">
+        <!-- Modulo 1: Logica Proposicional -->
+        <div class="module-item-card" data-module="logic">
+          <div class="module-badge bg-purple"><i data-lucide="calculator" class="lk-icon" aria-hidden="true"></i> Lógica</div>
+          <h3>Lógica Proposicional</h3>
+          <p>Genera tablas de verdad interactivas, visualiza el funcionamiento de los conectores lógicos y resuelve
+            equivalencias.</p>
+          <div class="module-footer">
+            <span class="xp-val"><i data-lucide="star" class="lk-icon" aria-hidden="true"></i> +150 XP</span>
+            <button class="btn btn-sm btn-primary btn-open-module" data-module="logic">Ingresar <i
+                data-lucide="circle-arrow-right" class="lk-icon"></i></button>
+          </div>
+        </div>
+
+        <!-- Modulo 2: Conjuntos -->
+        <div class="module-item-card" data-module="sets">
+          <div class="module-badge bg-blue"><i data-lucide="share-2" class="lk-icon" aria-hidden="true"></i> Conjuntos</div>
+          <h3>Teoría de Conjuntos</h3>
+          <p>Representa de forma visual operaciones como unión, intersección, diferencia y diferencia simétrica en
+            diagramas de Venn.</p>
+          <div class="module-footer">
+            <span class="xp-val"><i data-lucide="star" class="lk-icon" aria-hidden="true"></i> +200 XP</span>
+            <button class="btn btn-sm btn-primary btn-open-module" data-module="sets">Ingresar <i
+                data-lucide="circle-arrow-right" class="lk-icon"></i></button>
+          </div>
+        </div>
+
+        <!-- Modulo 3: Grafos -->
+        <div class="module-item-card" data-module="graphs">
+          <div class="module-badge bg-green"><i data-lucide="network" class="lk-icon" aria-hidden="true"></i> Grafos</div>
+          <h3>Teoría de Grafos</h3>
+          <p>Crea nodos y aristas de forma táctil y visualiza paso a paso recorridos de caminos mínimos y árboles de
+            expansión.</p>
+          <div class="module-footer">
+            <span class="xp-val"><i data-lucide="star" class="lk-icon" aria-hidden="true"></i> +300 XP</span>
+            <button class="btn btn-sm btn-primary btn-open-module" data-module="graphs">Ingresar <i
+                data-lucide="circle-arrow-right" class="lk-icon"></i></button>
+          </div>
+        </div>
+
+        <!-- Modulo 4: Relaciones -->
+        <div class="module-item-card" data-module="relations">
+          <div class="module-badge bg-violet"><i data-lucide="arrow-left-right" class="lk-icon" aria-hidden="true"></i> Relaciones</div>
+          <h3>Relaciones y Funciones</h3>
+          <p>Comprueba propiedades como reflexividad, simetría y transitividad mediante simulaciones interactivas de
+            matrices de adyacencia.</p>
+          <div class="module-footer">
+            <span class="xp-val"><i data-lucide="star" class="lk-icon" aria-hidden="true"></i> +250 XP</span>
+            <button class="btn btn-sm btn-primary btn-open-module" data-module="relations">Ingresar <i
+                data-lucide="circle-arrow-right" class="lk-icon"></i></button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3b. MI RUTA (solo sesión iniciada) -->
+    <section class="view" id="learning-route-view">
+      <div class="route-page-header">
+        <h2><i data-lucide="route" class="lk-icon section-icon"></i> Mi ruta de aprendizaje</h2>
+        <p>Progreso de <strong id="route-user-name">Estudiante</strong> — lecciones, práctica interactiva y certificados por módulo.</p>
+      </div>
+      <div class="route-stats-grid card card-neon">
+        <div class="route-stat"><span class="route-stat-label">XP</span><strong id="route-stat-xp">0</strong></div>
+        <div class="route-stat"><span class="route-stat-label">Nivel</span><strong id="route-stat-level">1</strong></div>
+        <div class="route-stat"><span class="route-stat-label">Racha</span><strong id="route-stat-streak">0</strong> días</div>
+        <div class="route-stat"><span class="route-stat-label">Módulos certificados</span><strong id="route-stat-modules">0 / 4</strong></div>
+      </div>
+      <div id="route-modules-list" class="route-modules-list"></div>
+      <p class="text-small text-muted route-footnote">Orden recomendado: Lógica → Conjuntos → Grafos → Relaciones. Cada módulo exige completar <strong>Aprender</strong> antes de <strong>Practicar</strong>.</p>
+    </section>
+
+    <!-- 3c. MI PERFIL (solo sesión iniciada) -->
+    <section class="view" id="profile-view">
+      <div class="profile-page-header">
+        <h2><i data-lucide="circle-user" class="lk-icon section-icon"></i> Mi perfil</h2>
+        <p>Cuenta LOGIKA y resumen de tu avance.</p>
+      </div>
+      <div class="profile-grid">
+        <div class="card card-neon profile-card-main">
+          <div class="profile-avatar-wrap"><i data-lucide="circle-user" class="lk-icon profile-avatar-icon"></i></div>
+          <h3 id="profile-display-name">Estudiante</h3>
+          <p id="profile-email" class="text-muted">—</p>
+          <div class="profile-stats-row">
+            <span><i data-lucide="star" class="lk-icon text-yellow"></i> <strong id="profile-xp">0</strong> XP</span>
+            <span><i data-lucide="zap" class="lk-icon text-cyan"></i> Nivel <strong id="profile-level">1</strong></span>
+            <span><i data-lucide="flame" class="lk-icon text-orange"></i> <strong id="profile-streak">0</strong> días</span>
+          </div>
+        </div>
+        <div class="card card-neon hidden" id="profile-school-block">
+          <h4><i data-lucide="graduation-cap" class="lk-icon"></i> Colegio</h4>
+          <p id="profile-school-text"></p>
+        </div>
+        <div class="card card-neon">
+          <h4>Progreso por módulo</h4>
+          <ul id="profile-modules-list" class="profile-modules-list"></ul>
+        </div>
+        <div class="card card-neon">
+          <h4>Certificados obtenidos</h4>
+          <div id="profile-certs-list"></div>
+        </div>
+      </div>
+      <button type="button" class="btn btn-sm btn-dark mt-4" data-target="dashboard-view"><i data-lucide="arrow-left" class="lk-icon"></i> Volver a módulos</button>
+    </section>
+
+    <!-- 4. COLEGIO INVITADO VIEW -->
+    <section class="view" id="school-view">
+      <div class="school-hero">
+        <div class="school-content">
+          <span class="badge-school"><i data-lucide="flame" class="lk-icon" aria-hidden="true"></i> ¡Futuros Ingenieros!</span>
+          <h2><i data-lucide="laptop" class="lk-icon section-icon" aria-hidden="true"></i> ¿Por qué estudiar Ingeniería de Sistemas?</h2>
+          <p>Descubre el increíble mundo de la tecnología. La programación no es solo matemáticas aburridas en un
+            tablero, ¡es lógica creativa que te permite dar vida a tus ideas!</p>
+          <div class="tech-fields">
+            <div class="tech-field-tag"><i data-lucide="bot" class="lk-icon" aria-hidden="true"></i> Inteligencia Artificial</div>
+            <div class="tech-field-tag"><i data-lucide="gamepad-2" class="lk-icon" aria-hidden="true"></i> Desarrollo de Videojuegos</div>
+            <div class="tech-field-tag"><i data-lucide="shield" class="lk-icon" aria-hidden="true"></i> Ciberseguridad / Hacking</div>
+            <div class="tech-field-tag"><i data-lucide="globe" class="lk-icon" aria-hidden="true"></i> Webs y Apps del Futuro</div>
+          </div>
+          <div class="gamified-route-box">
+            <h4><i data-lucide="map-pin" class="lk-icon" aria-hidden="true"></i> La Ruta del Programador (Grados 9, 10 y 11)</h4>
+            <p>Juega los 3 mini-retos interactivos con <strong>Logiko</strong> para ver cómo se aplican las matemáticas
+              discretas en la programación real. ¡Obtén tu medalla virtual de la Unisimón!</p>
+
+            <div class="school-cta-card" id="school-cta-card">
+              <p class="school-cta-lead"><i data-lucide="graduation-cap" class="lk-icon" aria-hidden="true"></i>
+                <strong>Antes de jugar:</strong> dinos tu colegio, tu nombre y grado para personalizar tu medalla y tu aventura.</p>
+              <div class="school-cta-form" id="school-cta-form">
+                <div class="form-group">
+                  <label for="school-name-input">Nombre del colegio</label>
+                  <input type="text" id="school-name-input" class="set-input" placeholder="Ej: IE San José" maxlength="120" required>
+                </div>
+                <div class="form-group">
+                  <label for="student-name-input">Tu nombre o apodo</label>
+                  <input type="text" id="student-name-input" class="set-input" placeholder="Ej: María" maxlength="80" required>
+                </div>
+                <div class="form-group">
+                  <label for="student-grade-select">Grado</label>
+                  <select id="student-grade-select" class="set-input" required>
+                    <option value="">Selecciona tu grado</option>
+                    <option value="9">Grado 9</option>
+                    <option value="10">Grado 10</option>
+                    <option value="11">Grado 11</option>
+                  </select>
+                </div>
+                <button type="button" class="btn btn-primary btn-block" id="btn-save-school-profile">
+                  <i data-lucide="rocket" class="lk-icon" aria-hidden="true"></i> Guardar y empezar aventura
+                </button>
+              </div>
+              <div class="school-cta-saved hidden" id="school-cta-saved">
+                <p id="school-cta-summary"></p>
+                <button type="button" class="btn btn-primary btn-block" id="btn-start-school-quiz">
+                  <i data-lucide="gamepad-2" class="lk-icon" aria-hidden="true"></i> Empezar aventura
+                </button>
+                <button type="button" class="btn btn-link btn-sm" id="btn-edit-school-profile">Editar datos</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="school-mascot-area">
+          <div class="card-mascot-speech">
+            <div class="speech-bubble">
+              <p id="school-mascot-bubble">¡Hola! Soy <strong>Logiko</strong>. Te guiaré en esta aventura de sistemas.
+                ¿Sabías que los mapas de Google funcionan gracias a la teoría de Grafos? ¡Pruébalo conmigo!</p>
+            </div>
+            <div class="mascot-container-school" id="mascot-school-container">
+              <!-- Inline SVG mascot loaded here -->
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- High School Challenge Modal/Area -->
+      <div class="school-quiz-box hidden" id="school-quiz-area">
+        <div class="quiz-progress-bar">
+          <div class="quiz-progress-fill" id="school-quiz-progress" style="width: 33%;"></div>
+        </div>
+        <div class="school-quiz-card">
+          <div class="quiz-header">
+            <span class="step-indicator" id="school-quiz-step">Reto 1 de 3</span>
+            <h4 id="school-quiz-title">Lógica de Programación: El Enigma del Robot</h4>
+          </div>
+          <div class="quiz-body" id="school-quiz-body">
+            <!-- Quiz questions loaded dynamically -->
+          </div>
+          <div class="quiz-explanation-panel hidden" id="quiz-explanation-panel" role="region"
+            aria-labelledby="quiz-explanation-heading">
+            <h5 id="quiz-explanation-heading"><i data-lucide="lightbulb" class="lk-icon" aria-hidden="true"></i> Explicación del reto</h5>
+            <div id="quiz-explanation-content"></div>
+          </div>
+          <div class="quiz-footer">
+            <div class="quiz-feedback-text text-green hidden" id="quiz-feedback">¡Respuesta correcta!</div>
+            <button class="btn btn-secondary hidden" id="btn-quiz-explanation">Ver por qué</button>
+            <button class="btn btn-primary" id="btn-school-quiz-next">Verificar Respuesta</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 5. ABOUT US VIEW -->
+    <section class="view" id="about-view">
+      <div class="about-container">
+        <div class="about-hero">
+          <span class="unisimón-badge">Universidad Simón Bolívar</span>
+          <h2>Proyecto LOGIKA</h2>
+          <p>Un espacio interactivo diseñado en Cúcuta para revolucionar la enseñanza y el aprendizaje de las
+            matemáticas discretas en los cursos de Ingeniería de Sistemas.</p>
+        </div>
+
+        <h3>Equipo de Desarrollo</h3>
+        <div class="team-grid">
+          <div class="member-card">
+            <div class="member-avatar"><i data-lucide="code" class="lk-icon" aria-hidden="true"></i></div>
+            <h4>Jesus Omar Avendaño A.</h4>
+            <p class="role">Ingeniería de Sistemas</p>
+            <span class="tag">Desarrollo Lógico & Back</span>
+          </div>
+          <div class="member-card">
+            <div class="member-avatar"><i data-lucide="palette" class="lk-icon" aria-hidden="true"></i></div>
+            <h4>Saraic Noemi León H.</h4>
+            <p class="role">Ingeniería de Sistemas</p>
+            <span class="tag">Diseño UI/UX & Gamificación</span>
+          </div>
+          <div class="member-card">
+            <div class="member-avatar"><i data-lucide="settings" class="lk-icon" aria-hidden="true"></i></div>
+            <h4>Eduardo José Soto H.</h4>
+            <p class="role">Ingeniería de Sistemas</p>
+            <span class="tag">Arquitectura & Integración</span>
+          </div>
+        </div>
+
+        <div class="about-details">
+          <h3>Nuestra Misión</h3>
+          <p>Las matemáticas discretas son la piedra angular de las ciencias de la computación. Comprender cómo fluye la
+            información en proposiciones lógicas, cómo se organizan los datos en conjuntos, o cómo se conectan los
+            servidores a través de grafos, suele ser abstracto y difícil. LOGIKA nace para transformar esas
+            abstracciones en animaciones e interacciones arrastrables en tiempo real, permitiendo a los estudiantes
+            aprender experimentando y equivocándose de forma lúdica.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 6. MODULE: LOGIC VIEW -->
+    <section class="view" id="logic-view">
+      <div class="module-page-header">
+        <button class="btn btn-sm btn-dark btn-back-dashboard"><i data-lucide="arrow-left" class="lk-icon" aria-hidden="true"></i> Volver a
+          Módulos</button>
+        <h2>Lógica Proposicional</h2>
+      </div>
+
+      <div class="module-layout">
+        <!-- Interactive Tool Panel -->
+        <div class="tool-panel">
+          <div class="card card-neon">
+            <h3>Generador de Tablas de Verdad</h3>
+            <p>Ingresa una proposición lógica utilizando los botones de conectores y haz clic en calcular.</p>
+
+            <div class="formula-input-container">
+              <label for="logic-formula-input" class="visually-hidden">Fórmula lógica</label>
+              <input type="text" id="logic-formula-input" placeholder="p ^ q -> r" class="formula-input"
+                aria-describedby="logic-keyboard-hint" autocomplete="off" spellcheck="false">
+              <button type="button" class="btn-clear" id="btn-logic-backspace" title="Borrar último símbolo"
+                aria-label="Retroceder un símbolo"><i data-lucide="delete" class="lk-icon" aria-hidden="true"></i></button>
+              <button type="button" class="btn-clear" id="btn-logic-clear" title="Borrar todo"
+                aria-label="Borrar fórmula"><i data-lucide="trash-2" class="lk-icon" aria-hidden="true"></i></button>
+            </div>
+            <p id="logic-keyboard-hint" class="text-small text-muted">Usa el teclado virtual o escribe con mayúsculas y símbolos alternativos (&&, ||, ¬).</p>
+
+            <!-- Virtual keyboard for logical connectors -->
+            <div class="logical-keyboard" role="group" aria-label="Teclado de conectores lógicos">
+              <button type="button" class="btn btn-kbd" data-token="p" aria-label="Variable p">p</button>
+              <button type="button" class="btn btn-kbd" data-token="q" aria-label="Variable q">q</button>
+              <button type="button" class="btn btn-kbd" data-token="r" aria-label="Variable r">r</button>
+              <button type="button" class="btn btn-kbd text-cyan" data-token="~" aria-label="Negación">~</button>
+              <button type="button" class="btn btn-kbd text-cyan" data-token="^" aria-label="Conjunción Y">^</button>
+              <button type="button" class="btn btn-kbd text-cyan" data-token="v" aria-label="Disyunción O">v</button>
+              <button type="button" class="btn btn-kbd text-cyan" data-token="->" aria-label="Condicional">→</button>
+              <button type="button" class="btn btn-kbd text-cyan" data-token="<->" aria-label="Bicondicional">↔</button>
+              <button type="button" class="btn btn-kbd" data-token="(" aria-label="Paréntesis abrir">(</button>
+              <button type="button" class="btn btn-kbd" data-token=")" aria-label="Paréntesis cerrar">)</button>
+            </div>
+
+            <button class="btn btn-primary btn-block btn-lg" id="btn-logic-calculate"><i data-lucide="calculator" class="lk-icon" aria-hidden="true"></i>
+              Generar Tabla de Verdad</button>
+          </div>
+
+          <div class="card mt-4">
+            <h3>Ejemplos de Equivalencias Lógicas</h3>
+            <div class="equivalences-list">
+              <button type="button" class="btn btn-sm btn-dark btn-load-logic-example" data-example-id="demorgan1">Ley de De Morgan 1</button>
+              <button type="button" class="btn btn-sm btn-dark btn-load-logic-example" data-example-id="conditional">Equivalencia Condicional</button>
+              <button type="button" class="btn btn-sm btn-dark btn-load-logic-example" data-example-id="distributive">Ley Distributiva</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Result / Explanation Panel -->
+        <div class="display-panel">
+          <div class="card card-result scroll-x" id="logic-result-card">
+            <h3>Resultado de la Simulación</h3>
+            <div class="placeholder-result-message" id="logic-placeholder">
+              <i data-lucide="table" class="lk-icon text-purple text-giant animate-bounce" aria-hidden="true"></i>
+              <p>Ingresa una expresión y presiona <strong>Generar Tabla de Verdad</strong>. Logiko comprobará si tu
+                sintaxis es correcta y calculará la tabla para ti.</p>
+            </div>
+
+            <div id="logic-error-container" class="hidden" aria-live="assertive"></div>
+
+            <div class="logic-result-container hidden" id="logic-result-container" aria-live="polite">
+              <h4 id="logic-formula-title">Fórmula: </h4>
+              <div id="logic-classification-badge" class="badge-classification">Tautología</div>
+              <div class="table-scroll-container">
+                <table class="truth-table" id="truth-table-output">
+                  <!-- Generated Truth Table -->
+                </table>
+              </div>
+
+              <!-- Mini Quiz Inside Module for gamification -->
+              <div class="module-mini-quiz-card mt-4">
+                <h4><i data-lucide="award" class="lk-icon" aria-hidden="true"></i> Reto Rápido (+50 XP)</h4>
+                <p id="logic-mini-quiz-question">Según la tabla, ¿cómo clasificarías esta fórmula? (Tautología, Contradicción o Contingencia)</p>
+                <div class="quiz-choices" id="logic-mini-quiz-choices">
+                  <!-- Choices loaded dynamic -->
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 7. MODULE: SETS VIEW -->
+    <section class="view" id="sets-view">
+      <div class="module-page-header">
+        <button class="btn btn-sm btn-dark btn-back-dashboard"><i data-lucide="arrow-left" class="lk-icon" aria-hidden="true"></i> Volver a
+          Módulos</button>
+        <h2>Teoría de Conjuntos</h2>
+      </div>
+
+      <div class="module-layout">
+        <div class="tool-panel">
+          <div class="card card-neon">
+            <h3>Operaciones de Conjuntos</h3>
+            <p>Define los elementos de los conjuntos A y B, selecciona una operación y visualiza su diagrama de Venn.
+            </p>
+
+            <div class="form-group">
+              <label for="set-a-input">Conjunto A (separado por comas)</label>
+              <input type="text" id="set-a-input" value="1, 2, 3, 4, 5" class="set-input">
+            </div>
+
+            <div class="form-group">
+              <label for="set-b-input">Conjunto B (separado por comas)</label>
+              <input type="text" id="set-b-input" value="4, 5, 6, 7, 8" class="set-input">
+            </div>
+
+            <div class="form-group">
+              <label for="set-c-input">Conjunto C (opcional - activa 3 conjuntos)</label>
+              <div class="checkbox-wrapper">
+                <input type="checkbox" id="checkbox-enable-c"> Habilitar Conjunto C
+              </div>
+              <input type="text" id="set-c-input" value="2, 5, 8, 9, 10" class="set-input hidden" disabled>
+            </div>
+
+            <div class="set-operations-buttons">
+              <button class="btn btn-dark active" data-op="union">Unión (A ∪ B)</button>
+              <button class="btn btn-dark" data-op="intersection">Intersección (A ∩ B)</button>
+              <button class="btn btn-dark" data-op="difference_ab">Diferencia (A - B)</button>
+              <button class="btn btn-dark" data-op="difference_ba">Diferencia (B - A)</button>
+              <button class="btn btn-dark" data-op="sym_difference">Dif. Simétrica (A Δ B)</button>
+            </div>
+
+            <button class="btn btn-primary btn-block btn-lg mt-4" id="btn-calculate-sets"><i
+                data-lucide="calculator" class="lk-icon"></i> Calcular y ver en el diagrama</button>
+            <button type="button" class="btn btn-secondary btn-block mt-2 hidden" id="btn-sets-go-practice"><i data-lucide="arrow-right" class="lk-icon"></i> Siguiente: pon a prueba lo aprendido</button>
+          </div>
+        </div>
+
+        <div class="display-panel">
+          <div class="card card-result">
+            <div class="sets-phase-header">
+              <span class="sets-phase-pill active" id="sets-pill-learn">1 · Aprender</span>
+              <span class="sets-phase-pill" id="sets-pill-practice">2 · Pon a prueba</span>
+            </div>
+            <h3 id="sets-panel-title">Aprende con el diagrama de Venn</h3>
+            <p class="text-small text-muted" id="sets-panel-hint">Define A y B, elige una operación y calcula. Verás qué elementos pertenecen al resultado.</p>
+
+            <div class="sets-result-wrapper">
+              <div class="venn-diagram-canvas-container">
+                <canvas id="venn-canvas" width="450" height="350"></canvas>
+              </div>
+
+              <div class="sets-text-results" id="sets-learn-results">
+                <h4>Elementos calculados</h4>
+                <div class="result-box">
+                  <p><strong>Resultado operación:</strong> { <span id="set-result-elements">4, 5</span> }</p>
+                  <p><strong>Cardinalidad:</strong> <span id="set-result-cardinality">2</span></p>
+                </div>
+              </div>
+
+              <div class="module-mini-quiz-card mt-4 hidden" id="sets-practice-card">
+                <h4><i data-lucide="gamepad-2" class="lk-icon text-blue" aria-hidden="true"></i> Desafío de coloreado (+50 XP)</h4>
+                <p>Haz clic en las regiones del diagrama para colorear la operación: <strong><span id="venn-game-target">A ∩ B</span></strong></p>
+                <div class="venn-game-actions">
+                  <button type="button" class="btn btn-sm btn-secondary" id="btn-sets-back-learn">Volver a aprender</button>
+                  <button type="button" class="btn btn-sm btn-secondary" id="btn-venn-reset">Limpiar lienzo</button>
+                  <button type="button" class="btn btn-sm btn-primary" id="btn-venn-verify">Verificar coloreado</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 8. MODULE: GRAPHS VIEW -->
+    <section class="view" id="graphs-view">
+      <div class="module-page-header">
+        <button class="btn btn-sm btn-dark btn-back-dashboard"><i data-lucide="arrow-left" class="lk-icon" aria-hidden="true"></i> Volver a
+          Módulos</button>
+        <h2>Teoría de Grafos</h2>
+      </div>
+
+      <div class="module-layout-graphs">
+        <!-- Editor Control Panel -->
+        <div class="graph-controls-card">
+          <div class="card card-neon">
+            <h3>Constructor de Grafos</h3>
+            <p>Haz clic en el lienzo para crear nodos y aristas.</p>
+
+            <div class="graph-tool-selector">
+              <button class="btn btn-dark active" id="btn-graph-tool-node"><i data-lucide="circle" class="lk-icon" aria-hidden="true"></i> Crear
+                Nodo</button>
+              <button class="btn btn-dark" id="btn-graph-tool-edge"><i data-lucide="share-2" class="lk-icon" aria-hidden="true"></i> Conectar
+                Nodos</button>
+              <button class="btn btn-dark" id="btn-graph-tool-delete"><i data-lucide="eraser" class="lk-icon" aria-hidden="true"></i>
+                Eliminar</button>
+            </div>
+
+            <div class="form-group mt-3">
+              <label for="graph-edge-weight">Peso de la Arista a crear</label>
+              <input type="number" id="graph-edge-weight" value="1" min="1" max="99" class="set-input">
+            </div>
+
+            <div class="graph-algorithms-section mt-4">
+              <h4>Algoritmos Visuales</h4>
+              <p class="text-small">Selecciona dos nodos en el lienzo para calcular el camino más corto o ejecuta un
+                recorrido.</p>
+
+              <div class="form-group">
+                <label for="graph-node-start">Nodo Origen</label>
+                <select id="graph-node-start" class="set-input">
+                  <option value="">--Seleccionar--</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="graph-node-end">Nodo Destino</label>
+                <select id="graph-node-end" class="set-input">
+                  <option value="">--Seleccionar--</option>
+                </select>
+              </div>
+
+              <div class="algorithm-buttons">
+                <button class="btn btn-secondary btn-block" id="btn-graph-run-dijkstra"><i
+                    data-lucide="route" class="lk-icon"></i> Camino Mínimo (Dijkstra)</button>
+                <button class="btn btn-secondary btn-block" id="btn-graph-run-bfs"><i
+                    data-lucide="waypoints" class="lk-icon"></i> Recorrido BFS (Anchura)</button>
+              </div>
+
+              <button class="btn btn-danger btn-block mt-3" id="btn-graph-clear"><i
+                  data-lucide="trash-2" class="lk-icon"></i> Limpiar Todo el Grafo</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Interactive Canvas Area -->
+        <div class="graph-canvas-area">
+          <div class="card card-result card-graph-canvas">
+            <div class="graph-canvas-header">
+              <h3>Lienzo Interactivo de Grafos</h3>
+              <div class="canvas-instructions">
+                <span id="graph-canvas-tip"><i data-lucide="mouse-pointer-2" class="lk-icon" aria-hidden="true"></i> Tip: Haz clic en el lienzo para colocar un nodo
+                  para colocar un nodo.</span>
+              </div>
+            </div>
+            <div class="canvas-wrapper">
+              <canvas id="graph-canvas" width="600" height="420"></canvas>
+            </div>
+            <div class="graph-results-log" id="graph-log">
+              <p><i data-lucide="info" class="lk-icon text-cyan" aria-hidden="true"></i> Agrega nodos para ver la matriz de adyacencia e
+                iniciar caminos mínimos.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 9. MODULE: RELATIONS VIEW -->
+    <section class="view" id="relations-view">
+      <div class="module-page-header">
+        <button class="btn btn-sm btn-dark btn-back-dashboard"><i data-lucide="arrow-left" class="lk-icon" aria-hidden="true"></i> Volver a
+          Módulos</button>
+        <h2>Relaciones y Funciones</h2>
+      </div>
+
+      <div class="module-layout">
+        <div class="tool-panel">
+          <div class="card card-neon">
+            <h3>Definición de Relación Binaria</h3>
+            <p>Define el conjunto A y especifica qué pares ordenados forman la relación R en A x A.</p>
+
+            <div class="form-group">
+              <label for="relation-set-input">Conjunto A (separado por comas)</label>
+              <input type="text" id="relation-set-input" value="1, 2, 3" class="set-input">
+            </div>
+
+            <div class="form-group">
+              <label>Pares Ordenados en R (Selecciona en la matriz de la derecha o ingresa aquí):</label>
+              <input type="text" id="relation-pairs-input" value="(1,1), (2,2), (3,3), (1,2), (2,1)" class="set-input"
+                placeholder="Ej: (1,1), (1,2)">
+            </div>
+
+            <button class="btn btn-primary btn-block btn-lg mt-4" id="btn-calculate-relations"><i
+                data-lucide="calculator" class="lk-icon"></i> Analizar Propiedades</button>
+          </div>
+        </div>
+
+        <div class="display-panel">
+          <div class="card card-result">
+            <h3>Matriz e Indicadores de Propiedades</h3>
+
+            <div class="relations-result-wrapper">
+              <div class="relations-matrix-container">
+                <h4>Matriz de Adyacencia R</h4>
+                <div class="matrix-grid-scroll">
+                  <div class="matrix-grid-wrapper" id="relations-matrix-grid">
+                    <!-- Dynamic Matrix Grid checkbox editor -->
+                  </div>
+                </div>
+                <p class="text-small text-muted mt-2"><i data-lucide="circle-help" class="lk-icon" aria-hidden="true"></i> Haz clic en las celdas
+                  para activar/desactivar pares en la relación R en tiempo real.</p>
+              </div>
+
+              <div class="relations-properties-analysis">
+                <h4>Análisis de Propiedades:</h4>
+                <div class="properties-list">
+                  <div class="property-item" id="prop-reflexive">
+                    <span class="status-icon"><i data-lucide="circle-help" class="lk-icon" aria-hidden="true"></i></span>
+                    <span class="property-name">Reflexiva</span>
+                    <p class="property-desc text-small">¿Todos los elementos se relacionan con sí mismos? (x, x) ∈ R</p>
+                  </div>
+                  <div class="property-item" id="prop-symmetric">
+                    <span class="status-icon"><i data-lucide="circle-help" class="lk-icon" aria-hidden="true"></i></span>
+                    <span class="property-name">Simétrica</span>
+                    <p class="property-desc text-small">Si (x, y) ∈ R, entonces ¿(y, x) ∈ R?</p>
+                  </div>
+                  <div class="property-item" id="prop-transitive">
+                    <span class="status-icon"><i data-lucide="circle-help" class="lk-icon" aria-hidden="true"></i></span>
+                    <span class="property-name">Transitiva</span>
+                    <p class="property-desc text-small">Si (x, y) y (y, z) ∈ R, entonces ¿(x, z) ∈ R?</p>
+                  </div>
+                  <div class="property-item" id="prop-antisymmetric">
+                    <span class="status-icon"><i data-lucide="circle-help" class="lk-icon" aria-hidden="true"></i></span>
+                    <span class="property-name">Antisimétrica</span>
+                    <p class="property-desc text-small">Si (x, y) y (y, x) ∈ R, entonces ¿x = y?</p>
+                  </div>
+                </div>
+
+                <div class="equivalence-result mt-4" id="equivalence-relation-badge">
+                  <!-- Equivalence relation indicator -->
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Global Floating Mascot / Dialog Widget -->
+  <div class="floating-mascot-widget" id="global-mascot-widget">
+    <div class="mascot-float-anchor">
+      <div class="mascot-speech-bubble hidden" id="global-speech-bubble">
+        <span class="btn-close-bubble" id="btn-close-speech"><i data-lucide="x" class="lk-icon" aria-hidden="true"></i></span>
+        <p id="global-mascot-speech-text">¡Hola! Soy Logiko.</p>
+      </div>
+      <div class="mascot-interactive-svg" id="global-mascot-svg-container">
+        <!-- Mascot SVG injected here -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Sound effects toggle in bottom right -->
+  <button type="button" class="sound-toggle-btn" id="btn-toggle-sound"
+    aria-label="Activar o desactivar efectos de sonido" title="Activar/Desactivar efectos de sonido">
+    <i data-lucide="volume-2" class="lk-icon" aria-hidden="true"></i>
+  </button>
+
+  <!-- Toast notifications (WCAG live region) -->
+  <div id="toast-container" class="toast-container" aria-live="polite" aria-relevant="additions"></div>
+
+  <!-- Modal: apodo para módulos académicos -->
+  <div id="nickname-modal" class="modal-overlay hidden" role="dialog" aria-modal="true"
+    aria-labelledby="nickname-modal-title">
+    <div class="modal-card">
+      <header class="modal-header">
+        <h3 id="nickname-modal-title"><i data-lucide="user" class="lk-icon" aria-hidden="true"></i> ¿Cómo te llamamos?</h3>
+        <button type="button" class="modal-close" id="nickname-modal-close" aria-label="Cerrar">
+          <i data-lucide="x" class="lk-icon" aria-hidden="true"></i>
+        </button>
+      </header>
+      <div class="modal-body">
+        <p>Elige un <strong>apodo o nombre</strong> para guardar tu progreso en este dispositivo (aunque no hayas iniciado sesión).</p>
+        <div class="form-group">
+          <label for="nickname-input">Tu apodo</label>
+          <input type="text" id="nickname-input" class="set-input" placeholder="Ej: LogikoFan42" maxlength="32" required>
+        </div>
+      </div>
+      <footer class="modal-footer">
+        <button type="button" class="btn btn-primary" id="nickname-modal-save">Continuar</button>
+      </footer>
+    </div>
+  </div>
+
+  <!-- Accessible modal dialog -->
+  <div id="custom-modal" class="modal-overlay hidden" role="dialog" aria-modal="true"
+    aria-labelledby="modal-title" aria-describedby="modal-body">
+    <div class="modal-card">
+      <header class="modal-header">
+        <h3 id="modal-title"></h3>
+        <button type="button" class="modal-close" id="modal-close-btn" aria-label="Cerrar ventana">
+          <i data-lucide="x" class="lk-icon" aria-hidden="true"></i>
+        </button>
+      </header>
+      <div class="modal-body" id="modal-body"></div>
+      <footer class="modal-footer">
+        <button type="button" class="btn btn-primary" id="modal-confirm-btn">Entendido</button>
+      </footer>
+    </div>
+  </div>
+
+  <!-- Import JS Logic -->
+  <script type="module" src="./src/main.js"></script>
+</body>
+
+</html>
